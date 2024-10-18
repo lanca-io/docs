@@ -1,3 +1,69 @@
-# Get started
+# Install Concero SDK
 
-Hello world!
+Integrate our SDK to your dapp
+
+## Installation
+
+To get started, install the latest version of Concero SDK
+
+:::code-group
+
+```bash [npm]
+npm i @concero/sdk
+```
+
+```bash [bun]
+yarn add @concero/sdk
+```
+
+```bash [pnpm]
+pnpm add @concero/sdk
+```
+
+```bash [bun]
+bun add @concero/sdk
+```
+
+:::
+
+## Quick Start
+
+### Set up the SDK
+
+Initialize a Wallet Client
+
+```ts
+import { createWalletClient, custom } from 'viem'
+import { mainnet } from 'viem/chains'
+
+const walletClient = createWalletClient({
+	chain: mainnet,
+	transport: custom(window.ethereum),
+})
+```
+
+Create SDK config with your integrator string and WalletProvider.
+
+```ts
+import { ConceroConfig } from '@concero/sdk'
+
+const conceroConfig: ConceroConfig = {
+	integratorId: 'your dapp name',
+	feeTier: 0.3, //your fee tier
+	walletClient: walletClient,
+}
+```
+
+Initialize the client object
+
+```ts
+import { ConceroClient } from '@concero/sdk'
+
+const conceroClient = new ConceroClient(conceroConfig)
+```
+
+Use the SDK
+
+```ts
+const supportedChains = conceroClient.getSupportedChains()
+```
