@@ -1,0 +1,141 @@
+# Data Types
+
+### `ConceroToken`
+
+An interface representing a token in a blockchain.
+
+Properties
+- `address`: `string` - token address
+- `chainId`: `string` - blockchain chain identifier
+- `decimals`: `number` - number of decimal places in the token
+- `logoURL`: `string` - token logo URL
+- `name`: `string` - token name
+- `symbol`: `string` - token symbol
+- `priceUsd`: `number` - token price in USD
+
+---
+
+### `ConceroChain`
+
+An interface representing a blockchain chain.
+
+Properties
+- `id`: `string` - blockchain chain identifier
+- `explorerURL`: `string` - blockchain explorer URL
+- `logoURL`: `string` - blockchain chain logo URL
+- `name`: `string` - blockchain chain name
+
+---
+
+### `TxType`
+
+An enumeration representing a transaction type.
+
+Values
+- `SRC_SWAP` - transaction type for token swap on the source chain
+- `BRIDGE` - transaction type for chain transition
+- `DST_SWAP` - transaction type for token swap on the destination chain
+
+---
+
+### `Status`
+
+An enumeration representing a transaction status.
+
+Values
+- `SUCCESS` - successful transaction status
+- `FAILED` - failed transaction status
+- `PENDING` - pending transaction status
+- `NOT_STARTED` - not started transaction status
+
+---
+
+### `TxStep`
+
+An interface representing a transaction step.
+
+Properties
+- `type`: `TxType` - transaction step type
+- `status`: `Status` - transaction step status
+- `txHash`: `string` - transaction hash
+- `error`: `string` - transaction step error (optional)
+
+---
+
+### `RouteTool`
+
+An interface representing a routing tool.
+
+Properties
+- `name`: `string` - tool name
+- `amountOutMin`: `string` - minimum output amount (optional)
+- `logoURL`: `string` - tool logo URL
+- `params`: `object` with tool parameters (optional)
+    - `fee`: `number` - tool fee (optional)
+    - `deadline`: `number` - tool deadline (optional)
+    - `sqrPrice`: `string` - tool square price (optional)
+    - `sqrPrice`: `string` - tool square price (optional)
+    - `path`: `string` - tool path (optional)
+
+---
+
+### `RouteInternalStep`
+
+An interface representing an internal routing step.
+
+Properties
+- `from`: `object` with information about the source token and chain
+    - `token`: `ConceroToken` - source token
+    - `chain`: `ConceroChain` - source chain
+    - `amount`: `string` - source token amount
+- `to`: `object` with information about the destination token and chain
+    - `token`: `ConceroToken` - destination token
+    - `chain`: `ConceroChain` - destination chain
+    - `amount`: `string` - destination token amount
+- `tool`: `RouteTool` - routing tool
+
+---
+
+### `RouteStep`
+
+An interface representing a routing step.
+
+Properties
+- `type`: `TxType` - routing step type
+    - `token`: `ConceroToken` - source token
+    - `chain`: `ConceroChain` - source chain
+    - `amount`: `string` - source token amount
+- `from`: `object` with information about the source token and chain
+    - `token`: `ConceroToken` - source token
+    - `chain`: `ConceroChain` - source chain
+    - `amount`: `string` - source token amount
+- `to`: `object` with information about the destination token and chain
+    - `token`: `ConceroToken` - destination token
+    - `chain`: `ConceroChain` - destination chain
+    - `amount`: `string` - destination token amount
+- `internalSteps`: `RouteInternalStep[]` - array of internal routing steps
+
+---
+
+### `RouteType`
+
+An interface representing a routing type.
+
+Properties
+- `type`: `TxType` - routing step type
+    - `token`: `ConceroToken` - source token
+    - `chain`: `ConceroChain` - source chain
+    - `amount`: `string` - source token amount
+- `from`: `object` with information about the source token and chain
+    - `token`: `ConceroToken` - source token
+    - `chain`: `ConceroChain` - source chain
+    - `amount`: `string` - source token amount
+- `to`: `object` with information about the destination token and chain
+    - `token`: `ConceroToken` - destination token
+    - `chain`: `ConceroChain` - destination chain
+    - `amount`: `string` - destination token amount
+- `steps`: `RouteStep[]` - array of routing steps
+
+---
+
+
