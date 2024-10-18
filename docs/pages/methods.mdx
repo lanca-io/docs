@@ -1,0 +1,169 @@
+# ConceroClient
+
+The `ConceroClient` class provides a set of methods for interacting with the Concero API.
+
+## Methods
+
+### `getRoute`
+
+#### Description
+Retrieves a route for a given set of parameters. The route is an object that contains the necessary information for executing a swap.
+
+#### Parameters
+
+- `fromChainId` : `string`. The ID of the source chain
+- `toChainId` : `string`. The ID of the destination chain
+- `fromToken` : `string`. The token to swap from
+- `toToken` :`string`. The token to swap to
+- `amount` : `string`. The amount of tokens to swap
+- `slippageTolerance` : `string` . The maximum allowed slippage (optional, default: '0.5')
+
+#### Return Type
+- `Promise<RouteType | undefined>`
+
+#### Example
+
+```ts
+const client = new ConceroClient(config)
+const route = await client.getRoute({
+    fromChainId: '137',
+    toChainId: '8453',
+    fromToken: '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619', //WETH
+    toToken: '0x0555E30da8f98308EdB960aa94C0Db47230d2B9c' //WBTC
+    amount: '100000'
+})
+```
+---
+
+### `getSupportedTokens`
+
+#### Description
+Retrieves a list of supported tokens for a given chain ID, name, symbol, and limit.
+
+#### Parameters
+
+- `chainId` : `string`. The ID of the chain to retrieve tokens for
+- `name` : `string`. The name of the token to retrieve (optional)
+- `symbol` : `string`. The symbol of the token to retrieve (optional)
+- `limit` :`string`. The maximum number of tokens to retrieve (optional, default: '10000000')
+
+#### Return Type
+- `Promise<ConceroToken[] | undefined>`
+
+#### Example
+
+```ts
+const client = new ConceroClient(config)
+const route = await client.getSupportedTokens({
+    chainId: '137',
+    name: 'Wrapped Ether', 
+    symbol: 'WETH' 
+    limit: '10'
+})
+```
+
+---
+
+### `getSupportedChains`
+
+#### Description
+Retrieves a list of supported chains.
+
+#### Parameters
+
+- None
+
+#### Return Type
+- `Promise<ConceroChain[] | undefined>`
+
+#### Example
+
+```ts
+const client = new ConceroClient(config)
+const route = await client.getSupportedChains()
+```
+
+---
+
+### `getRouteStatus`
+
+#### Description
+Retrieves the status of a route for a given transaction hash.
+
+#### Parameters
+
+- `txHash` : `string`. The transaction hash of the route
+
+#### Return Type
+- `Promise<RouteStatus>`
+
+#### Example
+
+```ts
+const client = new ConceroClient(config)
+const status = await client.getRouteStatus('0x8de5ab492728a8c226b519d061c1b53dfc435aedb3ab2e1c5dfc388a4e9cfdef')
+```
+
+---
+
+### `executeRoute`
+
+#### Description
+Executes a previously retrieved route using the provided execution configurations.
+
+#### Parameters
+
+- `route` : `RouteType`. The route object retrieved from `getRoute`
+- `executionConfigs` : `ExecutionConfigs`. The execution configurations for the swap
+    - `switchChainHook`: `SwitchChainHook`. The hook to switch chain (optional)
+    - `updateRouteStatusHook` : `UpdateRouteHook`. The hook to update route status (optional)
+    - `txLink` : `string`. The transaction hash link (optional)
+
+#### Return Type
+- `Promise<void>`
+
+#### Example
+
+```ts
+const client = new ConceroClient(config)
+const route = await client.getRoute({
+    fromChainId: '137',
+    toChainId: '8453',
+    fromToken: '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619', //WETH
+    toToken: '0x0555E30da8f98308EdB960aa94C0Db47230d2B9c' //WBTC
+    amount: '100000'
+})
+await client.executeRoute(route)
+```
+
+---
+
+### `executeRoute`
+
+#### Description
+Executes a previously retrieved route using the provided execution configurations.
+
+#### Parameters
+
+- `route` : `RouteType`. The route object retrieved from `getRoute`
+- `executionConfigs` : `ExecutionConfigs`. The execution configurations for the swap
+    - `switchChainHook`: `SwitchChainHook`. The hook to switch chain (optional)
+    - `updateRouteStatusHook` : `UpdateRouteHook`. The hook to update route status (optional)
+    - `txLink` : `string`. The transaction hash link (optional)
+
+#### Return Type
+- `Promise<void>`
+
+#### Example
+
+```ts
+const client = new ConceroClient(config)
+const route = await client.getRoute({
+    fromChainId: '137',
+    toChainId: '8453',
+    fromToken: '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619', //WETH
+    toToken: '0x0555E30da8f98308EdB960aa94C0Db47230d2B9c' //WBTC
+    amount: '100000'
+})
+await client.executeRoute(route)
+```
