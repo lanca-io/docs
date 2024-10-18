@@ -1,0 +1,6 @@
+# dependencies
+node_modules
+.env
+cache
+.idea
+.DS_Store
