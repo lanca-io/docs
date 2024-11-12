@@ -8,6 +8,10 @@ export default defineConfig({
       link: '/getting-started',
     },
     {
+      text: 'Supported Chains',
+      link: '/supported-chains',
+    },
+    {
       text: 'Methods',
       link: '/methods',
     },
