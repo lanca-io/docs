@@ -1,7 +1,14 @@
 import { defineConfig } from 'vocs'
 
 export default defineConfig({
-  title: 'Docs',
+  title: 'LancaSDK Docs',
+  baseUrl: 'https://docs.lanca.io',
+  logoUrl: {
+    light: 'logo/lanca/logo-light.svg',
+    dark: 'logo/lanca/logo-dark.svg',
+  },
+  rootDir: 'docs',
+  iconUrl: 'logo/lanca/favicon.ico',
   sidebar: [
     {
       text: 'Getting Started',
