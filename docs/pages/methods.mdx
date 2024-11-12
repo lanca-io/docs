@@ -23,14 +23,7 @@ Retrieves a route for a given set of parameters. The route is an object that con
 #### Example
 
 ```ts
-const lanca = new LancaSDK(config)
-const route = await lanca.getRoute({
-    fromChainId: '137',
-    toChainId: '8453',
-    fromToken: '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619', //WETH
-    toToken: '0x0555E30da8f98308EdB960aa94C0Db47230d2B9c' //WBTC
-    amount: '100000'
-})
+// [!include ~/snippets/methods/getRoute.ts]
 ```
 ---
 
@@ -52,13 +45,7 @@ Retrieves a list of supported tokens for a given chain ID, name, symbol, and lim
 #### Example
 
 ```ts
-const lanca = new LancaSDK(config)
-const supportedTokens = await lanca.getSupportedTokens({
-    chainId: '137',
-    name: 'Wrapped Ether', 
-    symbol: 'WETH' 
-    limit: '10'
-})
+// [!include ~/snippets/methods/getSupportedTokens.ts]
 ```
 
 ---
@@ -78,8 +65,7 @@ Retrieves a list of supported chains.
 #### Example
 
 ```ts
-const lanca = new LancaSDK(config)
-const supportedChains = await lanca.getSupportedChains()
+// [!include ~/snippets/methods/getSupportedChains.ts]
 ```
 
 ---
@@ -99,8 +85,7 @@ Retrieves the status of a route for a given transaction hash.
 #### Example
 
 ```ts
-const lanca = new LancaSDK(config)
-const routeStatus = await lanca.getRouteStatus('0x8de5ab492728a8c226b519d061c1b53dfc435aedb3ab2e1c5dfc388a4e9cfdef')
+// [!include ~/snippets/methods/getRouteStatus.ts]
 ```
 
 ---
@@ -124,13 +109,5 @@ Executes a previously retrieved route using the provided execution configuration
 #### Example
 
 ```ts
-const lanca = new LancaSDK(config)
-const route = await lanca.getRoute({
-    fromChainId: '137',
-    toChainId: '8453',
-    fromToken: '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619', //WETH
-    toToken: '0x0555E30da8f98308EdB960aa94C0Db47230d2B9c' //WBTC
-    amount: '100000'
-})
-const routeWithStatus = await lanca.executeRoute(route)
+// [!include ~/snippets/methods/executeRoute.ts]
 ```
