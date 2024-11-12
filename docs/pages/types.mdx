@@ -1,0 +1,162 @@
+# Data Types
+
+## Types
+
+---
+
+### `RpcConfig`
+
+A type representing a configuration for RPC.
+
+Type
+- `Record<number, string[]> | Record<number, FallbackTransport>`- an object with chain IDs as keys and either arrays of RPC URLs or fallback transport configurations(from `viem`) as values
+---
+
+## Interfaces
+
+### `LancaSDKConfig`
+
+An interface representing a configuration for Lanca SDK.
+
+Properties
+- `integratorId`: `string` - integrator ID
+- `feeTier`: `number` - fee tier
+- `chains`: `RpcConfig` - optional configuration for chains
+
+---
+
+### `ConceroToken`
+
+An interface representing a token in a blockchain.
+
+Properties
+- `address`: `string` - token address
+- `chainId`: `string` - blockchain chain identifier
+- `decimals`: `number` - number of decimal places in the token
+- `logoURL`: `string` - token logo URL
+- `name`: `string` - token name
+- `symbol`: `string` - token symbol
+- `priceUsd`: `number` - token price in USD
+
+---
+
+### `ConceroChain`
+
+An interface representing a blockchain chain.
+
+Properties
+- `id`: `string` - blockchain chain identifier
+- `explorerURL`: `string` - blockchain explorer URL
+- `logoURL`: `string` - blockchain chain logo URL
+- `name`: `string` - blockchain chain name
+
+---
+
+### `TxStep`
+
+An interface representing a transaction step.
+
+Properties
+- `type`: `StepType` - transaction step type (optional)
+- `status`: `Status` - transaction step status
+- `txHash`: `string` - transaction hash (optional)
+- `error`: `string` - transaction step error (optional)
+
+---
+
+### `RouteTool`
+
+An interface representing a routing tool.
+
+Properties
+- `name`: `string` - tool name
+- `amountOutMin`: `string` - minimum output amount (optional)
+- `logoURL`: `string` - tool logo URL
+- `params`: `object` with tool parameters (optional)
+    - `fee`: `number` - tool fee (optional)
+    - `deadline`: `number` - tool deadline (optional)
+    - `sqrPrice`: `string` - tool square price (optional)
+    - `path`: `string` - tool path (optional)
+
+---
+
+### `SwapDirectionData`
+
+An interface representing a direction for swap.
+
+Properties
+- `token`: `ConceroToken` - source token
+- `chain`: `ConceroChain` - source chain
+- `amount`: `string` - token amount
+
+---
+
+### `RouteInternalStep`
+
+An interface representing an internal routing step.
+
+Properties
+- `from`: `SwapDirectionData` - information about the source token and chain
+- `to`: `SwapDirectionData` - information about the destination token and chain
+- `tool`: `RouteTool` - routing tool
+
+---
+
+### `RouteBaseStep`
+
+An interface representing a basic routing step.
+
+Properties
+- `type`: `StepType` - routing step type
+- `execution`: `TxStep` - current state of execution
+
+---
+
+### `RouteStep`
+
+An interface representing a routing step (extends `RouteBaseStep`).
+
+Properties
+- `from`: `SwapDirectionData` - information about the source token and chain
+- `to`: `SwapDirectionData` - information about the destination token and chain
+- `internalSteps`: `RouteInternalStep[]` - array of internal routing steps
+
+---
+
+### `RouteType`
+
+An interface representing a routing type.
+
+Properties
+- `from`: `SwapDirectionData` - information about the source token and chain
+- `to`: `SwapDirectionData` - information about the destination token and chain
+- `steps`: `Array<RouteStep | RouteBaseStep>` - array of routing steps
+
+---
+
+## Enums
+
+### `Status`
+
+An enumeration representing a transaction status.
+
+Values
+- `SUCCESS` - successful transaction status
+- `FAILED` - failed transaction status
+- `PENDING` - pending transaction status
+- `NOT_STARTED` - not started transaction status
+
+---
+
+### `StepType`
+
+An enumeration representing a step type.
+
+Values
+- `SRC_SWAP` - step type for token swap on the source chain
+- `BRIDGE` - step type for chain transition
+- `DST_SWAP` - step type for token swap on the destination chain
+- `ALLOWANCE` - step type for allowance
+- `SWITCH_CHAIN` - step type for switching chain
+
+---
