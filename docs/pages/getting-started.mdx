@@ -1,69 +1,48 @@
-# Install Concero SDK
+# Get started
 
-Integrate our SDK to your dapp
+Welcome to the Lanca SDK documentation! This page will guide you through the process of getting started with the Lanca SDK.
 
 ## Installation
 
-To get started, install the latest version of Concero SDK
-
+To install the Lanca SDK, run the following command in your terminal:
 :::code-group
-
+ 
 ```bash [npm]
-npm i @concero/sdk
+npm i @lanca/sdk
 ```
 
-```bash [bun]
-yarn add @concero/sdk
+```bash [yarn]
+yarn add @lanca/sdk
 ```
-
+ 
 ```bash [pnpm]
-pnpm add @concero/sdk
+pnpm add @lanca/sdk
 ```
-
+ 
 ```bash [bun]
-bun add @concero/sdk
+bun add @lanca/sdk
 ```
-
+ 
 :::
 
-## Quick Start
+## Creating a Configuration
 
-### Set up the SDK
-
-Initialize a Wallet Client
-
+To use the Lanca SDK, you need to create a configuration object. Here is an example of a basic configuration:
 ```ts
-import { createWalletClient, custom } from 'viem'
-import { mainnet } from 'viem/chains'
-
-const walletClient = createWalletClient({
-	chain: mainnet,
-	transport: custom(window.ethereum),
-})
+// [!include ~/snippets/getting-started/configuration.ts]
 ```
 
-Create SDK config with your integrator string and WalletProvider.
+Replace `YOUR_INTEGRATOR_ID` and `YOUR_PROJECT_ID` with your actual integrator ID and project ID.
 
+## Using the SDK
+
+Once you have created a configuration object, you can use the Lanca SDK to perform various operations. Here is an example of how to use the SDK to send a transaction:
 ```ts
-import { ConceroConfig } from '@concero/sdk'
-
-const conceroConfig: ConceroConfig = {
-	integratorId: 'your dapp name',
-	feeTier: 0.3, //your fee tier
-	walletClient: walletClient,
-}
+// [!include ~/snippets/getting-started/using.ts]
 ```
+This is just a basic example to get you started. For more information on the Lanca SDK and its features, please refer to the rest of the documentation.
 
-Initialize the client object
-
-```ts
-import { ConceroClient } from '@concero/sdk'
-
-const conceroClient = new ConceroClient(conceroConfig)
-```
-
-Use the SDK
-
-```ts
-const supportedChains = conceroClient.getSupportedChains()
-```
+## Next Steps
+- Learn more about the Lanca SDK and its features
+- Explore the API reference for more information on the available methods and properties
+- Check out the examples section for more code snippets and tutorials
