@@ -20,4 +20,25 @@ export default defineConfig({
       link: '/types',
     },
   ],
+  topNav: [
+    {
+      text: 'Get in touch',
+      link: 'mailto:support@concero.io',
+    },
+  ],
+  socials: [
+    {
+      icon: 'discord',
+      link: 'https://discord.gg/lanca',
+    },
+    {
+      icon: 'github',
+      link: 'https://github.com/concero',
+    },
+    {
+      icon: 'x',
+      link: 'https://twitter.com/concero_io',
+    },
+
+  ],
 })
