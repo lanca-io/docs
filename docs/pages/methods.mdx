@@ -1,11 +1,13 @@
 # LancaSDK
 
 The `LancaSDK` class provides a set of methods for interacting with the Lanca API.
+
 ## Methods
 
 ### `getRoute`
 
 #### Description
+
 Retrieves a route for a given set of parameters. The route is an object that contains the necessary information for executing a swap.
 
 #### Parameters
@@ -18,18 +20,21 @@ Retrieves a route for a given set of parameters. The route is an object that con
 - `slippageTolerance` : `string` . The maximum allowed slippage (optional, default: '0.5')
 
 #### Return Type
+
 - `Promise<RouteType | undefined>`
 
 #### Example
 
 ```ts
-// [!include ~/snippets/methods/getRoute.ts]
+// [!include ~/snippets/code/methods/getRoute.ts]
 ```
+
 ---
 
 ### `getSupportedTokens`
 
 #### Description
+
 Retrieves a list of supported tokens for a given chain ID, name, symbol, and limit.
 
 #### Parameters
@@ -40,12 +45,13 @@ Retrieves a list of supported tokens for a given chain ID, name, symbol, and lim
 - `limit` :`string`. The maximum number of tokens to retrieve (optional, default: '10000000')
 
 #### Return Type
+
 - `Promise<ConceroToken[] | undefined>`
 
 #### Example
 
 ```ts
-// [!include ~/snippets/methods/getSupportedTokens.ts]
+// [!include ~/snippets/code/methods/getSupportedTokens.ts]
 ```
 
 ---
@@ -53,6 +59,7 @@ Retrieves a list of supported tokens for a given chain ID, name, symbol, and lim
 ### `getSupportedChains`
 
 #### Description
+
 Retrieves a list of supported chains.
 
 #### Parameters
@@ -60,12 +67,13 @@ Retrieves a list of supported chains.
 - None
 
 #### Return Type
+
 - `Promise<ConceroChain[] | undefined>`
 
 #### Example
 
 ```ts
-// [!include ~/snippets/methods/getSupportedChains.ts]
+// [!include ~/snippets/code/methods/getSupportedChains.ts]
 ```
 
 ---
@@ -73,6 +81,7 @@ Retrieves a list of supported chains.
 ### `getRouteStatus`
 
 #### Description
+
 Retrieves the status of a route for a given transaction hash.
 
 #### Parameters
@@ -80,12 +89,13 @@ Retrieves the status of a route for a given transaction hash.
 - `txHash` : `string`. The transaction hash of the route
 
 #### Return Type
+
 - `Promise<TxStep[] | undefined>`
 
 #### Example
 
 ```ts
-// [!include ~/snippets/methods/getRouteStatus.ts]
+// [!include ~/snippets/code/methods/getRouteStatus.ts]
 ```
 
 ---
@@ -93,21 +103,23 @@ Retrieves the status of a route for a given transaction hash.
 ### `executeRoute`
 
 #### Description
+
 Executes a previously retrieved route using the provided execution configurations.
 
 #### Parameters
 
 - `route` : `RouteType`. The route object retrieved from `getRoute`
 - `executionConfigs` : `ExecutionConfigs`. The execution configurations for the swap
-    - `switchChainHook`: `SwitchChainHook`. The hook to switch chain (optional)
-    - `updateRouteStatusHook` : `UpdateRouteHook`. The hook to update route status (optional)
-    - `txLink` : `string`. The transaction hash link (optional)
+  - `switchChainHook`: `SwitchChainHook`. The hook to switch chain (optional)
+  - `updateRouteStatusHook` : `UpdateRouteHook`. The hook to update route status (optional)
+  - `txLink` : `string`. The transaction hash link (optional)
 
 #### Return Type
+
 - `Promise<RouteType | undefined>`
 
 #### Example
 
 ```ts
-// [!include ~/snippets/methods/executeRoute.ts]
+// [!include ~/snippets/code/methods/executeRoute.ts]
 ```
