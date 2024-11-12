@@ -1,7 +1,6 @@
-# ConceroClient
+# LancaSDK
 
-The `ConceroClient` class provides a set of methods for interacting with the Concero API.
-
+The `LancaSDK` class provides a set of methods for interacting with the Lanca API.
 ## Methods
 
 ### `getRoute`
@@ -24,8 +23,8 @@ Retrieves a route for a given set of parameters. The route is an object that con
 #### Example
 
 ```ts
-const client = new ConceroClient(config)
-const route = await client.getRoute({
+const lanca = new LancaSDK(config)
+const route = await lanca.getRoute({
     fromChainId: '137',
     toChainId: '8453',
     fromToken: '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619', //WETH
@@ -53,8 +52,8 @@ Retrieves a list of supported tokens for a given chain ID, name, symbol, and lim
 #### Example
 
 ```ts
-const client = new ConceroClient(config)
-const route = await client.getSupportedTokens({
+const lanca = new LancaSDK(config)
+const supportedTokens = await lanca.getSupportedTokens({
     chainId: '137',
     name: 'Wrapped Ether', 
     symbol: 'WETH' 
@@ -79,8 +78,8 @@ Retrieves a list of supported chains.
 #### Example
 
 ```ts
-const client = new ConceroClient(config)
-const route = await client.getSupportedChains()
+const lanca = new LancaSDK(config)
+const supportedChains = await lanca.getSupportedChains()
 ```
 
 ---
@@ -95,13 +94,13 @@ Retrieves the status of a route for a given transaction hash.
 - `txHash` : `string`. The transaction hash of the route
 
 #### Return Type
-- `Promise<RouteStatus>`
+- `Promise<TxStep[] | undefined>`
 
 #### Example
 
 ```ts
-const client = new ConceroClient(config)
-const status = await client.getRouteStatus('0x8de5ab492728a8c226b519d061c1b53dfc435aedb3ab2e1c5dfc388a4e9cfdef')
+const lanca = new LancaSDK(config)
+const routeStatus = await lanca.getRouteStatus('0x8de5ab492728a8c226b519d061c1b53dfc435aedb3ab2e1c5dfc388a4e9cfdef')
 ```
 
 ---
@@ -120,50 +119,18 @@ Executes a previously retrieved route using the provided execution configuration
     - `txLink` : `string`. The transaction hash link (optional)
 
 #### Return Type
-- `Promise<void>`
+- `Promise<RouteType | undefined>`
 
 #### Example
 
 ```ts
-const client = new ConceroClient(config)
-const route = await client.getRoute({
+const lanca = new LancaSDK(config)
+const route = await lanca.getRoute({
     fromChainId: '137',
     toChainId: '8453',
     fromToken: '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619', //WETH
     toToken: '0x0555E30da8f98308EdB960aa94C0Db47230d2B9c' //WBTC
     amount: '100000'
 })
-await client.executeRoute(route)
-```
-
----
-
-### `executeRoute`
-
-#### Description
-Executes a previously retrieved route using the provided execution configurations.
-
-#### Parameters
-
-- `route` : `RouteType`. The route object retrieved from `getRoute`
-- `executionConfigs` : `ExecutionConfigs`. The execution configurations for the swap
-    - `switchChainHook`: `SwitchChainHook`. The hook to switch chain (optional)
-    - `updateRouteStatusHook` : `UpdateRouteHook`. The hook to update route status (optional)
-    - `txLink` : `string`. The transaction hash link (optional)
-
-#### Return Type
-- `Promise<void>`
-
-#### Example
-
-```ts
-const client = new ConceroClient(config)
-const route = await client.getRoute({
-    fromChainId: '137',
-    toChainId: '8453',
-    fromToken: '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619', //WETH
-    toToken: '0x0555E30da8f98308EdB960aa94C0Db47230d2B9c' //WBTC
-    amount: '100000'
-})
-await client.executeRoute(route)
+const routeWithStatus = await lanca.executeRoute(route)
 ```
