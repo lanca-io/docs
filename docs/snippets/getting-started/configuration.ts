@@ -1,4 +1,4 @@
-import { LancaSDKConfig } from '@lanca/sdk'
+import { type LancaSDKConfig } from '@lanca/sdk'
 
 const config: LancaSDKConfig = {
     integratorId: 'YOUR_INTEGRATOR_ID',
