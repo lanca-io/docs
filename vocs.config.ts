@@ -8,8 +8,12 @@ export default defineConfig({
       link: '/getting-started',
     },
     {
-      text: 'Example',
-      link: '/example',
+      text: 'Methods',
+      link: '/methods',
+    },
+    {
+      text: 'Types',
+      link: '/types',
     },
   ],
 })
