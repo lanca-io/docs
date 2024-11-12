@@ -1,6 +1,6 @@
 {
 	"name": "lanca-docs",
-	"version": "0.0.0",
+	"version": "0.0.1",
 	"type": "module",
 	"scripts": {
 		"dev": "vocs dev",
@@ -9,9 +9,11 @@
 	},
 	"dependencies": {
 		"@types/react": "latest",
+		"acorn": "8.14.0",
 		"react": "latest",
 		"react-dom": "latest",
 		"typescript": "latest",
+		"vite": "5.4.11",
 		"vocs": "latest"
 	}
 }
