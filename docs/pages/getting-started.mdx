@@ -2,7 +2,9 @@
 
 Welcome to the Lanca SDK documentation! This page will guide you through the process of getting started with the Lanca SDK.
 
-## Installation
+::::steps
+
+### Installation
 
 To install the Lanca SDK, run the following command in your terminal:
 :::code-group
@@ -25,22 +27,47 @@ bun add @lanca/sdk
 
 :::
 
-## Creating a Configuration
+### Creating a Configuration
 
 To use the Lanca SDK, you need to create a configuration object. Here is an example of a basic configuration:
 
 ```ts
-// [!include ~/snippets/code/getting-started/configuration.ts]
+// [!include ~/snippets/code/getting-started/using.ts:config]
 ```
 
 Replace `YOUR_INTEGRATOR_ID` with your actual integrator ID.
 
-## Using the SDK
+### Creating a LancaSDK
 
-Once you have created a configuration object, you can use the Lanca SDK to perform various operations. Here is an example of how to use the SDK to send a transaction:
+To use the Lanca SDK, you need to create a LancaSDK object. Here is an example of a basic usage:
 
 ```ts
-// [!include ~/snippets/code/getting-started/using.ts]
+// [!include ~/snippets/code/getting-started/using.ts:sdk]
+```
+
+### Request a route
+
+To request a route for token exchange, please provide the addresses of the two tokens, their network IDs, the amount of the first token, and the slippage percentage.
+For example, you can request a route by specifying the token addresses, network IDs, amount, and slippage, and our SDK will provide you with the optimal route for the exchange.
+
+```ts
+// [!include ~/snippets/code/getting-started/using.ts:requestRoute]
+```
+
+### Execute a route
+
+To execute a route for token exchange, please provide the obtained route data and our SDK will handle the exchange process for you. Simply pass the route data to the LancaSDK object and it will execute the exchange according to the provided parameters.
+
+```ts
+// [!include ~/snippets/code/getting-started/using.ts:sdk:executeRoute]
+```
+
+### Track route status
+
+To track the status of a route for token exchange, you can use the `getRouteStatus` method of the LancaSDK object. This method allows you to retrieve the current status of the route, including any updates or changes that have occurred during the exchange process.
+
+```ts
+// [!include ~/snippets/code/getting-started/using.ts:sdk:trackRouteStatus]
 ```
 
 This is just a basic example to get you started. For more information on the Lanca SDK and its features, please refer to the rest of the documentation.

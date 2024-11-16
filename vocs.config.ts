@@ -4,8 +4,8 @@ export default defineConfig({
   title: 'LancaSDK Docs',
   baseUrl: 'https://docs.lanca.io',
   logoUrl: {
-    light: 'logo/lanca/logo-light.svg',
-    dark: 'logo/lanca/logo-dark.svg',
+    light: 'logo/lanca/Lanca_logo=whiteBG.svg',
+    dark: 'logo/lanca/Lanca_logo=darkBG.svg',
   },
   rootDir: 'docs',
   iconUrl: 'logo/lanca/favicon.ico',
