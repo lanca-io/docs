@@ -9,19 +9,60 @@
 A type representing a configuration for RPC.
 
 Type
+
 - `Record<number, string[]> | Record<number, FallbackTransport>`- an object with chain IDs as keys and either arrays of RPC URLs or fallback transport configurations(from `viem`) as values
+
+---
+
+### `SwitchChainHook`
+
+A type representing a hook function that switches the blockchain chain.
+
+Type
+
+- `(chainId: number) => Promise<WalletClient | undefined | void>`- a function that takes a chain ID as an argument and returns a promise that resolves to a WalletClient object, undefined, or void.
+
+This hook is used to switch the blockchain chain and retrieve a WalletClient object for the new chain. The hook function should handle the chain switching logic and return a promise that resolves to the WalletClient object or undefined if the chain switching fails.
+
+---
+
+### `UpdateRouteHook`
+
+A type representing a hook function that updates the route execution state.
+
+Type
+
+- `(executionState: RouteType) => void`- a function that takes the current execution state of the route as an argument and updates the route execution state accordingly.
+
+This hook is used to update the route execution state in real-time, allowing for dynamic changes to the route execution process. The hook function should handle the logic for updating the route execution state based on the provided execution state.
+
 ---
 
 ## Interfaces
+
+### `ExecutionConfig`
+
+An interface representing the configuration for the execution of a route.
+
+Properties
+
+- `switchChainHook`: `SwitchChainHook` - a hook function that switches the blockchain chain. (optional)
+- `updateRouteStatusHook`: `UpdateRouteHook` - a hook function that updates the route execution state. (optional)
+- `txLink`: `string` - a link to the transaction. (optional)
+
+This configuration object is used to customize the execution of a route. The `switchChainHook` property allows for custom chain switching logic, while the `updateRouteStatusHook` property enables real-time updates to the route execution state. The `txLink` property provides a link to the transaction for easy access.
+
+---
 
 ### `LancaSDKConfig`
 
 An interface representing a configuration for Lanca SDK.
 
 Properties
+
 - `integratorId`: `string` - integrator ID
 - `feeTier`: `number` - fee tier
-- `chains`: `RpcConfig` - optional configuration for chains
+- `chains`: `RpcConfig` - configuration for chains(optional)
 
 ---
 
@@ -30,6 +71,7 @@ Properties
 An interface representing a token in a blockchain.
 
 Properties
+
 - `address`: `string` - token address
 - `chainId`: `string` - blockchain chain identifier
 - `decimals`: `number` - number of decimal places in the token
@@ -45,6 +87,7 @@ Properties
 An interface representing a blockchain chain.
 
 Properties
+
 - `id`: `string` - blockchain chain identifier
 - `explorerURL`: `string` - blockchain explorer URL
 - `logoURL`: `string` - blockchain chain logo URL
@@ -57,6 +100,7 @@ Properties
 An interface representing a transaction step.
 
 Properties
+
 - `type`: `StepType` - transaction step type (optional)
 - `status`: `Status` - transaction step status
 - `txHash`: `string` - transaction hash (optional)
@@ -69,14 +113,15 @@ Properties
 An interface representing a routing tool.
 
 Properties
+
 - `name`: `string` - tool name
 - `amountOutMin`: `string` - minimum output amount (optional)
 - `logoURL`: `string` - tool logo URL
 - `params`: `object` with tool parameters (optional)
-    - `fee`: `number` - tool fee (optional)
-    - `deadline`: `number` - tool deadline (optional)
-    - `sqrPrice`: `string` - tool square price (optional)
-    - `path`: `string` - tool path (optional)
+  - `fee`: `number` - tool fee (optional)
+  - `deadline`: `number` - tool deadline (optional)
+  - `sqrPrice`: `string` - tool square price (optional)
+  - `path`: `string` - tool path (optional)
 
 ---
 
@@ -85,6 +130,7 @@ Properties
 An interface representing a direction for swap.
 
 Properties
+
 - `token`: `ConceroToken` - source token
 - `chain`: `ConceroChain` - source chain
 - `amount`: `string` - token amount
@@ -96,6 +142,7 @@ Properties
 An interface representing an internal routing step.
 
 Properties
+
 - `from`: `SwapDirectionData` - information about the source token and chain
 - `to`: `SwapDirectionData` - information about the destination token and chain
 - `tool`: `RouteTool` - routing tool
@@ -107,6 +154,7 @@ Properties
 An interface representing a basic routing step.
 
 Properties
+
 - `type`: `StepType` - routing step type
 - `execution`: `TxStep` - current state of execution
 
@@ -117,6 +165,7 @@ Properties
 An interface representing a routing step (extends `RouteBaseStep`).
 
 Properties
+
 - `from`: `SwapDirectionData` - information about the source token and chain
 - `to`: `SwapDirectionData` - information about the destination token and chain
 - `internalSteps`: `RouteInternalStep[]` - array of internal routing steps
@@ -128,6 +177,7 @@ Properties
 An interface representing a routing type.
 
 Properties
+
 - `from`: `SwapDirectionData` - information about the source token and chain
 - `to`: `SwapDirectionData` - information about the destination token and chain
 - `steps`: `Array<RouteStep | RouteBaseStep>` - array of routing steps
@@ -141,6 +191,7 @@ Properties
 An enumeration representing a transaction status.
 
 Values
+
 - `SUCCESS` - successful transaction status
 - `FAILED` - failed transaction status
 - `PENDING` - pending transaction status
@@ -153,6 +204,7 @@ Values
 An enumeration representing a step type.
 
 Values
+
 - `SRC_SWAP` - step type for token swap on the source chain
 - `BRIDGE` - step type for chain transition
 - `DST_SWAP` - step type for token swap on the destination chain
