@@ -46,6 +46,7 @@ const executionConfig: ExecutionConfig = {
 
 const routeWithStatus = await lanca.executeRoute(route, walletClient, executionConfig)
 // [!endregion executeRoute]
+
 // [!region trackRouteStatus]
 const routeStatus = await lanca.getRouteStatus('0x231b5f78e90bf71996fd65a05c93a0d0fdb562a2cd8eb6944a833c80bae39b3e')
 // [!endregion trackRouteStatus]
