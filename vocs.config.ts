@@ -30,7 +30,7 @@ export default defineConfig({
   topNav: [
     {
       text: 'Get in touch',
-      link: 'mailto:support@concero.io',
+      link: 'mailto:support@lanca.io',
     },
   ],
   socials: [
@@ -40,11 +40,11 @@ export default defineConfig({
     },
     {
       icon: 'github',
-      link: 'https://github.com/concero',
+      link: 'https://github.com/lanca-io',
     },
     {
       icon: 'x',
-      link: 'https://twitter.com/concero_io',
+      link: 'https://x.com/lanca_io',
     },
 
   ],
