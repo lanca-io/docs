@@ -10,7 +10,7 @@ A type representing a configuration for RPC.
 
 Type
 
-- `Record<number, string[]> | Record<number, FallbackTransport>`- an object with chain IDs as keys and either arrays of RPC URLs or fallback transport configurations(from `viem`) as values
+- `Record<number, string[]> | Record<number, FallbackTransport>`- an object with chain IDs as keys and either arrays of RPC URLs or fallback transport configurations (from `viem`) as values. This structure allows for flexible and efficient management of RPC connections across multiple blockchain networks.
 
 ---
 
@@ -54,15 +54,15 @@ This configuration object is used to customize the execution of a route. The `sw
 
 ---
 
-### `LancaSDKConfig`
+### `LancaClientConfig`
 
-An interface representing a configuration for Lanca SDK.
+An interface representing a configuration for LancaClient.
 
 Properties
 
-- `integratorAddress`: `string` - integrator address
+- `integratorAddress`: `Address` - integrator address
 - `feeBps`: `number` - fee tier
-- `chains`: `RpcConfig` - configuration for chains(optional)
+- `chains`: `RpcConfig` - Configuration for the supported blockchain networks. This property is optional and allows users to specify the RPC (Remote Procedure Call) settings for different chains that the client will interact with. Proper configuration of this property ensures that the client can communicate effectively with the desired blockchain networks.
 
 ---
 
@@ -72,13 +72,13 @@ An interface representing a token in a blockchain.
 
 Properties
 
-- `address`: `string` - token address
-- `chainId`: `string` - blockchain chain identifier
-- `decimals`: `number` - number of decimal places in the token
-- `logoURL`: `string` - token logo URL
-- `name`: `string` - token name
-- `symbol`: `string` - token symbol
-- `priceUsd`: `number` - token price in USD
+- `address`: `Address` - the unique address of the token on the blockchain. This is the contract address that identifies the token and is used for transactions and interactions.
+- `chainId`: `string` - the identifier for the blockchain network on which the token resides. This helps in distinguishing tokens that may have the same name or symbol but exist on different chains.
+- `decimals`: `number` - the number of decimal places that the token supports. This value indicates the smallest unit of the token and is crucial for accurate calculations and transactions involving fractional amounts.
+- `logoURL`: `string` - the URL pointing to the token's logo image. This is used for visual representation in user interfaces, helping users easily identify the token.
+- `name`: `string` - the full name of the token. This is a human-readable representation of the token, providing clarity about its purpose or function.
+- `symbol`: `string` - the abbreviated symbol of the token, typically consisting of a few letters. This is used for quick identification and trading of the token on exchanges.
+- `priceUsd`: `number` - the current price of the token expressed in USD. This value provides users with an understanding of the token's market value and is essential for trading and investment decisions.
 
 ---
 
@@ -88,10 +88,10 @@ An interface representing a blockchain chain.
 
 Properties
 
-- `id`: `string` - blockchain chain identifier
-- `explorerURL`: `string` - blockchain explorer URL
-- `logoURL`: `string` - blockchain chain logo URL
-- `name`: `string` - blockchain chain name
+- `id`: `string` - the unique identifier for the blockchain chain. This ID is used to reference the chain in various operations and configurations.
+- `explorerURL`: `string` - the URL of the blockchain explorer for the chain. This link allows users to view transactions, blocks, and other on-chain data, providing transparency and insight into the blockchain's activity.
+- `logoURL`: `string` - the URL pointing to the logo image of the blockchain chain. This is used for branding and visual representation in applications, helping users recognize the chain easily.
+- `name`: `string` - The full name of the blockchain chain. This human-readable name provides context about the chain's purpose, features, or community, making it easier for users to understand its significance.
 
 ---
 
@@ -103,8 +103,8 @@ Properties
 
 - `type`: `StepType` - transaction step type (optional)
 - `status`: `Status` - transaction step status
-- `txHash`: `string` - transaction hash (optional)
-- `error`: `string` - transaction step error (optional)
+- `txHash`: `Hash` - the unique hash of the transaction associated with this step. This property is optional and can be included to provide a reference for users to look up the transaction on a blockchain explorer or to verify its status.
+- `error`: `string` - a message describing any error that occurred during this transaction step. This property is optional and is particularly useful for debugging and informing users about issues that may have prevented the step from completing successfully.
 
 ---
 
@@ -122,76 +122,76 @@ Properties
 
 ### `RouteTool`
 
-An interface representing a routing tool.
+An interface representing a routing tool used for facilitating token swaps or transactions across different decentralized exchanges (DEXs). This interface provides essential information about the tool, enabling users and applications to utilize it effectively for routing transactions.
 
 Properties
 
-- `name`: `string` - tool name
-- `amountOutMin`: `string` - minimum output amount (optional)
-- `logoURL`: `string` - tool logo URL
-- `data`: `object` with tool parameters (optional)
-  - `dexRouter`: `Address` - the address of dex router
-  - `dexCallData`: `Hex` - calldata to send to DexSwap contract
+- `name`: `string` - the name of the routing tool. This property provides a human-readable identifier for the tool, helping users understand which routing mechanism or service is being utilized.
+- `amountOutMin`: `string` - the minimum output amount expected from the transaction. This property is optional and allows users to set a threshold for the minimum amount of tokens they wish to receive from the swap. Setting this value helps protect users from unfavorable market conditions and slippage.
+- `logoURL`: `string` - the URL pointing to the logo image of the routing tool. This property is used for visual representation in user interfaces, allowing users to easily identify the tool being used for the transaction.
+- `data`: `object` - an object containing additional parameters specific to the routing tool. This property is optional and can include various parameters that are necessary for the tool's operation:
+  - `dexRouter`: `Address` - the address of the DEX router that will facilitate the token swap. This address is crucial for directing the transaction to the correct smart contract on the blockchain.
+  - `dexCallData`: `Hex` - the calldata to be sent to the DexSwap contract. This hexadecimal string contains the encoded function call and parameters required for executing the swap on the DEX, ensuring that the transaction is processed correctly.
 
 ---
 
 ### `SwapDirectionData`
 
-An interface representing a direction for swap.
+An interface representing the direction for a token swap. This interface encapsulates the details of the source token and its associated blockchain chain, providing essential information for executing a swap.
 
 Properties
 
-- `token`: `ConceroToken` - source token
-- `chain`: `ConceroChain` - source chain
-- `amount`: `string` - token amount
+- `token`: `ConceroToken` - the source token involved in the swap. This property provides details about the token being exchanged, including its address, symbol, and other relevant attributes.
+- `chain`: `ConceroChain` - the blockchain chain on which the source token resides. This property identifies the network where the token is located, ensuring that the swap is executed on the correct chain.
+- `amount`: `string` - the amount of the source token to be swapped. This value represents the quantity of tokens that the user intends to exchange, which is crucial for calculating the swap's output.
 
 ---
 
 ### `RouteInternalStep`
 
-An interface representing an internal routing step.
+An interface representing an internal routing step within a transaction process. This interface provides information about the source and destination tokens and chains involved in the routing.
 
 Properties
 
-- `from`: `SwapDirectionData` - information about the source token and chain
-- `to`: `SwapDirectionData` - information about the destination token and chain
-- `tool`: `RouteTool` - routing tool
+- `from`: `SwapDirectionData` - information about the source token and chain. This property contains details about the token being swapped and the chain it originates from.
+- `to`: `SwapDirectionData` - information about the destination token and chain. This property provides details about the token that will be received after the swap and the chain it will be sent to.
+- `tool`: `RouteTool` - the routing tool used for this internal step. This property specifies the mechanism or service that facilitates the swap, including any relevant parameters.
 
 ---
 
 ### `RouteBaseStep`
 
-An interface representing a basic routing step.
+An interface representing a basic routing step in the transaction process. This interface serves as a foundation for more complex routing steps.
 
 Properties
 
-- `type`: `StepType` - routing step type
-- `execution`: `TxStep` - current state of execution (optional)
+- `type`: `StepType` - the type of the routing step. This property categorizes the step within the routing process, providing context about its function.
+- `execution`: `TxStep` - the current state of execution for this step. This property is optional and can be used to track the progress and status of the step, including any errors that may have occurred.
 
 ---
 
 ### `RouteStep`
 
-An interface representing a routing step (extends `RouteBaseStep`).
+An interface representing a routing step that extends `RouteBaseStep`. This interface provides detailed information about the routing process, including the source and destination tokens and any internal steps involved.
 
 Properties
 
-- `from`: `SwapDirectionData` - information about the source token and chain
-- `to`: `SwapDirectionData` - information about the destination token and chain
-- `internalSteps`: `RouteInternalStep[]` - array of internal routing steps
-- `fees`: `Fee[]` - array of Fee objects (optional)
+- `from`: `SwapDirectionData` - information about the source token and chain. This property contains details about the token being swapped and the chain it originates from.
+- `to`: `SwapDirectionData` - information about the destination token and chain. This property provides details about the token that will be received after the swap and the chain it will be sent to.
+- `internalSteps`: `RouteInternalStep[]` - an array of internal routing steps. This property contains the sequence of internal steps that will be executed as part of the routing process, detailing how the swap will be carried out.
+- `fees`: `Fee[]` - an array of fee objects associated with this routing step. This property is optional and provides information about the transaction fees that will be incurred during the swap.
 
 ---
 
 ### `RouteType`
 
-An interface representing a routing type.
+An interface representing a routing type. This interface encapsulates the overall routing process, including the source and destination tokens and the steps involved in the routing.
 
 Properties
 
-- `from`: `SwapDirectionData` - information about the source token and chain
-- `to`: `SwapDirectionData` - information about the destination token and chain
-- `steps`: `Array<RouteStep | RouteBaseStep>` - array of routing steps
+- `from`: `SwapDirectionData` - information about the source token and chain. This property contains details about the token being swapped and the chain it originates from.
+- `to`: `SwapDirectionData` - information about the destination token and chain. This property provides details about the token that will be received after the swap and the chain it will be sent to.
+- `steps`: `Array<RouteStep | RouteBaseStep>` - an array of routing steps. This property contains the sequence of steps that will be executed during the routing process, detailing how the swap will be carried out.
 
 ---
 
@@ -199,27 +199,27 @@ Properties
 
 ### `Status`
 
-An enumeration representing a transaction status.
+An enumeration representing the status of a transaction. This enumeration provides a set of predefined values to indicate the current state of a transaction.
 
 Values
 
-- `SUCCESS` - successful transaction status
-- `FAILED` - failed transaction status
-- `PENDING` - pending transaction status
-- `NOT_STARTED` - not started transaction status
+- `SUCCESS` - indicates that the transaction was successful and completed without issues.
+- `FAILED` - indicates that the transaction has failed, typically due to an error or issue during execution.
+- `PENDING` - indicates that the transaction is currently pending and has not yet been completed.
+- `NOT_STARTED` - indicates that the transaction has not yet been initiated.
 
 ---
 
 ### `StepType`
 
-An enumeration representing a step type.
+An enumeration representing the type of a routing step. This enumeration provides predefined values to categorize the various steps involved in the routing process.
 
 Values
 
-- `SRC_SWAP` - step type for token swap on the source chain
-- `BRIDGE` - step type for chain transition
-- `DST_SWAP` - step type for token swap on the destination chain
-- `ALLOWANCE` - step type for allowance
-- `SWITCH_CHAIN` - step type for switching chain
+- `SRC_SWAP` - represents a step for swapping tokens on the source chain. This step involves exchanging the source token for another token within the same blockchain network.
+- `BRIDGE` - represents a step for transitioning between chains. This step facilitates the movement of tokens from one blockchain network to another, often involving a bridging mechanism.
+- `DST_SWAP` - represents a step for swapping tokens on the destination chain. This step occurs after the tokens have been bridged and involves exchanging the tokens for the desired token on the target blockchain network.
+- `ALLOWANCE` - represents a step for setting the allowance for token transfers. This step is necessary when a user needs to grant permission for a smart contract to spend a specified amount of their tokens on their behalf.
+- `SWITCH_CHAIN` - represents a step for switching chains. This step indicates that the transaction process involves changing the active blockchain network, which may be necessary for executing certain operations or swaps.
 
 ---
