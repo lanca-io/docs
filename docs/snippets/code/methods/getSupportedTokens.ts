@@ -1,5 +1,5 @@
-const lanca = new LancaSDK(config)
-const supportedTokens = await lanca.getSupportedTokens({
+const lancaClient = new LancaClient(config)
+const supportedTokens = await lancaClient.getSupportedTokens({
     chainId: '137',
     name: 'Wrapped Ether',
     symbol: 'WETH' 

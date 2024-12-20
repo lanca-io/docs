@@ -1,6 +1,6 @@
-import { type LancaSDKConfig } from '@lanca/sdk'
+import { type LancaClientConfig } from '@lanca/sdk'
 
-const config: LancaSDKConfig = {
+const config: LancaClientConfig = {
     integratorAddress: 'YOUR_INTEGRATOR_ADDRESS',
     feeBps: 1,
     chains: {

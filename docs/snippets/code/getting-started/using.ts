@@ -1,9 +1,9 @@
 // [!region config]
-import { LancaSDK, LancaSDKConfig } from '@lanca/sdk'
+import { LancaClient, LancaClientConfig } from '@lanca/sdk'
 import { createWalletClient } from 'viem'
 import { polygon } from 'viem/chains'
 
-const config: LancaSDKConfig = {
+const config: LancaClientConfig = {
     integratorAddress: 'YOUR_INTEGRATOR_ADDRESS',
     feeBps: 1,
     chains: {
@@ -14,21 +14,23 @@ const config: LancaSDKConfig = {
 // [!endregion config]
 
 // [!region sdk]
-const lanca = new LancaSDK(config)
+const lancaClient = new LancaClient(config)
 // [!endregion sdk]
-const supportedChains = await lanca.getSupportedChains()
-const supportedTokens = await lanca.getSupportedTokens({
+const supportedChains = await lancaClient.getSupportedChains()
+const supportedTokens = await lancaClient.getSupportedTokens({
     chainId: '137',
     symbol: 'WETH'
 })
 
 // [!region requestRoute]
-const route = await lanca.getRoute({
+const route = await lancaClient.getRoute({
     fromChainId: '137', // polygon
     toChainId: '8453', //  base
     fromToken: 'USDC',
     toToken: 'WETH',
     amount: '10',
+    fromAddress: '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619',
+    toAddress: '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619',
     slippageTolerance: '0.5',
 })
 // [!endregion requestRoute]
@@ -44,9 +46,9 @@ const executionConfig: ExecutionConfig = {
     updateRouteStatusHook: (route: RouteType) => console.log(route)
 }
 
-const routeWithStatus = await lanca.executeRoute(route, walletClient, executionConfig)
+const routeWithStatus = await lancaClient.executeRoute(route, walletClient, executionConfig)
 // [!endregion executeRoute]
 
 // [!region trackRouteStatus]
-const routeStatus = await lanca.getRouteStatus('0x231b5f78e90bf71996fd65a05c93a0d0fdb562a2cd8eb6944a833c80bae39b3e')
+const routeStatus = await lancaClient.getRouteStatus('0x231b5f78e90bf71996fd65a05c93a0d0fdb562a2cd8eb6944a833c80bae39b3e')
 // [!endregion trackRouteStatus]
