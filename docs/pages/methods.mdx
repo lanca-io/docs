@@ -1,6 +1,6 @@
 # LancaSDK
 
-The `LancaSDK` class provides a set of methods for interacting with the Lanca API.
+The `LancaClient` class provides a set of methods for interacting with the Lanca API.
 
 ## Methods
 
@@ -12,12 +12,14 @@ Retrieves a route for a given set of parameters. The route is an object that con
 
 #### Parameters
 
-- `fromChainId` : `string`. The ID of the source chain
-- `toChainId` : `string`. The ID of the destination chain
-- `fromToken` : `string`. The token to swap from
-- `toToken` :`string`. The token to swap to
-- `amount` : `string`. The amount of tokens to swap
-- `slippageTolerance` : `string` . The maximum allowed slippage (optional, default: '0.5')
+- `fromChainId` : `string`. The ID of the source chain from which the tokens will be swapped. This identifies the blockchain network where the tokens currently reside.
+- `toChainId` : `string`. The ID of the destination chain to which the tokens will be swapped. This indicates the blockchain network where the tokens will be sent after the swap.
+- `fromToken` : `Address`. The address of the token that the user wishes to swap from. This should be the contract address of the token being exchanged.
+- `toToken` :`Address`. The address of the token that the user wishes to swap to. This should be the contract address of the token that the user wants to receive in exchange.
+- `amount` : `string`. The amount of tokens to be swapped. This value should represent the quantity of the `fromToken` that the user intends to exchange.
+- `fromAddress`: `Address`. The address of the user from whom the tokens will be taken. This is the wallet address that holds the `fromToken` and will initiate the swap.
+- `toAddress`: `Address`. The address where the swapped tokens will be sent. This is the wallet address that will receive the `toToken` after the swap is completed.
+- `slippageTolerance` : `string` . The maximum allowed slippage during the swap transaction, expressed as a percentage. This parameter is optional, with a default value of '0.5'. Slippage refers to the difference between the expected price of a trade and the actual price at which the trade is executed. Setting a slippage tolerance helps to ensure that the transaction will go through even if the market conditions change slightly during the swap process.
 
 #### Return Type
 
