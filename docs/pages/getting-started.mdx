@@ -35,11 +35,11 @@ To use the Lanca SDK, you need to create a configuration object. Here is an exam
 // [!include ~/snippets/code/getting-started/using.ts:config]
 ```
 
-Replace `YOUR_INTEGRATOR_ID` with your actual integrator ID.
+Replace `YOUR_INTEGRATOR_ADDRESS` with your actual integrator address.
 
-### Creating a LancaSDK
+### Creating a LancaClient
 
-To use the Lanca SDK, you need to create a LancaSDK object. Here is an example of a basic usage:
+To use the Lanca SDK, you need to create a LancaClient object. Here is an example of a basic usage:
 
 ```ts
 // [!include ~/snippets/code/getting-started/using.ts:sdk]
@@ -64,7 +64,7 @@ To execute a route for token exchange, please provide the obtained route data an
 
 ### Track route status
 
-To track the status of a route for token exchange, you can use the `getRouteStatus` method of the LancaSDK object. This method allows you to retrieve the current status of the route, including any updates or changes that have occurred during the exchange process.
+To track the status of a route for token exchange, you can use the `getRouteStatus` method of the LancaClient object. This method allows you to retrieve the current status of the route, including any updates or changes that have occurred during the exchange process.
 
 ```ts
 // [!include ~/snippets/code/getting-started/using.ts:trackRouteStatus]
