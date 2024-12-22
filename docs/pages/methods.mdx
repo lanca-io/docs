@@ -25,6 +25,20 @@ Retrieves a route for a given set of parameters. The route is an object that con
 
 - `Promise<RouteType | undefined>`
 
+#### Error Types
+
+- `UnsupportedTokenError` - thrown when the specified token(s) is(are) not supported for swapping.
+- `UnsupportedChainError` - thrown when the specified chain(s) is(are) not supported for swapping.
+- `WrongAmountError` - thrown when the amount specified for the swap is incorrect.
+- `TokensAreTheSameError` - thrown when the `fromToken` and `toToken` are the same.
+- `NoRouteError` - thrown when no valid route is found for the swap.
+- `TooHighAmountError` - thrown when the specified amount exceeds the allowed limit.
+- `TooLowAmountError` - thrown when the specified amount is below the minimum required for the swap.
+- `AmountBelowFeeError` - thrown when the amount is less than the transaction fee.
+- `WrongSlippageError` - thrown when the specified slippage tolerance is invalid.
+- `MissingParamsError` - thrown when required parameters are missing.
+- `HTTPError` - thrown when there is an issue with the HTTP request during the swap process.
+
 #### Example
 
 ```ts
