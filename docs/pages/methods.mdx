@@ -38,6 +38,7 @@ Retrieves a route for a given set of parameters. The route is an object that con
 - `WrongSlippageError` - thrown when the specified slippage tolerance is invalid.
 - `MissingParamsError` - thrown when required parameters are missing.
 - `HTTPError` - thrown when there is an issue with the HTTP request during the swap process.
+- `UserRejectedError` - thrown when the user rejected to sing the transaction
 
 #### Example
 
@@ -56,8 +57,8 @@ Retrieves a list of supported tokens for a given chain ID, name, symbol, and lim
 #### Parameters
 
 - `chainId` : `string`. The ID of the chain to retrieve tokens for
-- `name` : `string`. The name of the token to retrieve (optional)
-- `symbol` : `string`. The symbol of the token to retrieve (optional)
+- `name?` : `string`. The name of the token to retrieve
+- `symbol?` : `string`. The symbol of the token to retrieve
 - `limit` :`string`. The maximum number of tokens to retrieve (optional, default: '10000000')
 
 #### Return Type
@@ -126,9 +127,9 @@ Executes a previously retrieved route using the provided execution configuration
 
 - `route` : `RouteType`. The route object retrieved from `getRoute`
 - `executionConfigs` : `ExecutionConfigs`. The execution configurations for the swap
-  - `switchChainHook`: `SwitchChainHook`. The hook to switch chain (optional)
-  - `updateRouteStatusHook` : `UpdateRouteHook`. The hook to update route status (optional)
-  - `txLink` : `string`. The transaction hash link (optional)
+  - `switchChainHook?`: `SwitchChainHook`. The hook to switch chain
+  - `updateRouteStatusHook?` : `UpdateRouteHook`. The hook to update route status
+  - `txLink?` : `string`. The transaction hash link
 
 #### Return Type
 
