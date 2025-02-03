@@ -73,7 +73,7 @@ Properties
 
 ---
 
-### `ConceroToken`
+### `LancaToken`
 
 An interface representing a token in a blockchain.
 
@@ -89,7 +89,7 @@ Properties
 
 ---
 
-### `ConceroChain`
+### `LancaChain`
 
 An interface representing a blockchain chain.
 
@@ -123,7 +123,7 @@ Properties
 
 - `type`: `string` - transaction fee type
 - `amount`: `string` - transaction fee amount
-- `token`: `ConceroToken` - fee token
+- `token`: `LancaToken` - fee token
 
 ---
 
@@ -148,8 +148,8 @@ An interface representing the direction for a token swap. This interface encapsu
 
 Properties
 
-- `token`: `ConceroToken` - the source token involved in the swap. This property provides details about the token being exchanged, including its address, symbol, and other relevant attributes.
-- `chain`: `ConceroChain` - the blockchain chain on which the source token resides. This property identifies the network where the token is located, ensuring that the swap is executed on the correct chain.
+- `token`: `LancaToken` - the source token involved in the swap. This property provides details about the token being exchanged, including its address, symbol, and other relevant attributes.
+- `chain`: `LancaChain` - the blockchain chain on which the source token resides. This property identifies the network where the token is located, ensuring that the swap is executed on the correct chain.
 - `amount`: `string` - the amount of the source token to be swapped. This value represents the quantity of tokens that the user intends to exchange, which is crucial for calculating the swap's output.
 
 ---
