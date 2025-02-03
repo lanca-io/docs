@@ -8,7 +8,7 @@ A type representing a configuration for RPC.
 
 Type
 
-- `Record<string, ChainWithProvider>`- an object with chain IDs as keys and either arrays of RPC URLs or fallback transport configurations (from viem) as values. This structure allows for flexible and efficient management of RPC connections across multiple blockchain networks.
+- `Record<string, IChainWithProvider>`- an object with chain IDs as keys and either arrays of RPC URLs or fallback transport configurations (from viem) as values. This structure allows for flexible and efficient management of RPC connections across multiple blockchain networks.
 
 ---
 
@@ -30,13 +30,13 @@ A type representing a hook function that updates the route execution state.
 
 Type
 
-- `(executionState: RouteType) => void`- a function that takes the current execution state of the route as an argument and updates the route execution state accordingly.
+- `(executionState: IRouteType) => void`- a function that takes the current execution state of the route as an argument and updates the route execution state accordingly.
 
 This hook is used to update the route execution state in real-time, allowing for dynamic changes to the route execution process. The hook function should handle the logic for updating the route execution state based on the provided execution state.
 
 ## Interfaces
 
-### `ChainWithProvider`
+### `IChainWithProvider`
 
 An interface representing the object with chain and provider.
 
@@ -47,7 +47,7 @@ Properties
 
 ---
 
-### `ExecutionConfig`
+### `IExecutionConfig`
 
 An interface representing the configuration for the execution of a route.
 
@@ -61,7 +61,7 @@ This configuration object is used to customize the execution of a route. The `sw
 
 ---
 
-### `LancaClientConfig`
+### `ILancaClientConfig`
 
 An interface representing a configuration for LancaClient.
 
@@ -73,7 +73,7 @@ Properties
 
 ---
 
-### `LancaToken`
+### `ILancaToken`
 
 An interface representing a token in a blockchain.
 
@@ -89,7 +89,7 @@ Properties
 
 ---
 
-### `LancaChain`
+### `ILancaChain`
 
 An interface representing a blockchain chain.
 
@@ -102,7 +102,7 @@ Properties
 
 ---
 
-### `TxStep`
+### `ITxStep`
 
 An interface representing a transaction step.
 
@@ -115,7 +115,7 @@ Properties
 
 ---
 
-### `Fee`
+### `IFee`
 
 An interface representing a transaction fee.
 
@@ -123,11 +123,11 @@ Properties
 
 - `type`: `string` - transaction fee type
 - `amount`: `string` - transaction fee amount
-- `token`: `LancaToken` - fee token
+- `token`: `ILancaToken` - fee token
 
 ---
 
-### `RouteTool`
+### `IRouteTool`
 
 An interface representing a routing tool used for facilitating token swaps or transactions across different decentralized exchanges (DEXs). This interface provides essential information about the tool, enabling users and applications to utilize it effectively for routing transactions.
 
@@ -142,63 +142,63 @@ Properties
 
 ---
 
-### `SwapDirectionData`
+### `ISwapDirectionData`
 
 An interface representing the direction for a token swap. This interface encapsulates the details of the source token and its associated blockchain chain, providing essential information for executing a swap.
 
 Properties
 
-- `token`: `LancaToken` - the source token involved in the swap. This property provides details about the token being exchanged, including its address, symbol, and other relevant attributes.
-- `chain`: `LancaChain` - the blockchain chain on which the source token resides. This property identifies the network where the token is located, ensuring that the swap is executed on the correct chain.
+- `token`: `ILancaToken` - the source token involved in the swap. This property provides details about the token being exchanged, including its address, symbol, and other relevant attributes.
+- `chain`: `ILancaChain` - the blockchain chain on which the source token resides. This property identifies the network where the token is located, ensuring that the swap is executed on the correct chain.
 - `amount`: `string` - the amount of the source token to be swapped. This value represents the quantity of tokens that the user intends to exchange, which is crucial for calculating the swap's output.
 
 ---
 
-### `RouteInternalStep`
+### `IRouteInternalStep`
 
 An interface representing an internal routing step within a transaction process. This interface provides information about the source and destination tokens and chains involved in the routing.
 
 Properties
 
-- `from`: `SwapDirectionData` - information about the source token and chain. This property contains details about the token being swapped and the chain it originates from.
-- `to`: `SwapDirectionData` - information about the destination token and chain. This property provides details about the token that will be received after the swap and the chain it will be sent to.
-- `tool`: `RouteTool` - the routing tool used for this internal step. This property specifies the mechanism or service that facilitates the swap, including any relevant parameters.
+- `from`: `ISwapDirectionData` - information about the source token and chain. This property contains details about the token being swapped and the chain it originates from.
+- `to`: `ISwapDirectionData` - information about the destination token and chain. This property provides details about the token that will be received after the swap and the chain it will be sent to.
+- `tool`: `IRouteTool` - the routing tool used for this internal step. This property specifies the mechanism or service that facilitates the swap, including any relevant parameters.
 
 ---
 
-### `RouteBaseStep`
+### `IRouteBaseStep`
 
 An interface representing a basic routing step in the transaction process. This interface serves as a foundation for more complex routing steps.
 
 Properties
 
 - `type`: `StepType` - the type of the routing step. This property categorizes the step within the routing process, providing context about its function.
-- `execution?`: `TxStep` - the current state of execution for this step. This property is optional and can be used to track the progress and status of the step, including any errors that may have occurred.
+- `execution?`: `ITxStep` - the current state of execution for this step. This property is optional and can be used to track the progress and status of the step, including any errors that may have occurred.
 
 ---
 
-### `RouteStep`
+### `IRouteStep`
 
-An interface representing a routing step that extends `RouteBaseStep`. This interface provides detailed information about the routing process, including the source and destination tokens and any internal steps involved.
+An interface representing a routing step that extends `IRouteBaseStep`. This interface provides detailed information about the routing process, including the source and destination tokens and any internal steps involved.
 
 Properties
 
-- `from`: `SwapDirectionData` - information about the source token and chain. This property contains details about the token being swapped and the chain it originates from.
-- `to`: `SwapDirectionData` - information about the destination token and chain. This property provides details about the token that will be received after the swap and the chain it will be sent to.
-- `internalSteps`: `RouteInternalStep[]` - an array of internal routing steps. This property contains the sequence of internal steps that will be executed as part of the routing process, detailing how the swap will be carried out.
-- `fees?`: `Fee[]` - an array of fee objects associated with this routing step. This property is optional and provides information about the transaction fees that will be incurred during the swap.
+- `from`: `ISwapDirectionData` - information about the source token and chain. This property contains details about the token being swapped and the chain it originates from.
+- `to`: `ISwapDirectionData` - information about the destination token and chain. This property provides details about the token that will be received after the swap and the chain it will be sent to.
+- `internalSteps`: `IRouteInternalStep[]` - an array of internal routing steps. This property contains the sequence of internal steps that will be executed as part of the routing process, detailing how the swap will be carried out.
+- `fees?`: `IFee[]` - an array of fee objects associated with this routing step. This property is optional and provides information about the transaction fees that will be incurred during the swap.
 
 ---
 
-### `RouteType`
+### `IRouteType`
 
 An interface representing a routing type. This interface encapsulates the overall routing process, including the source and destination tokens and the steps involved in the routing.
 
 Properties
 
-- `from`: `SwapDirectionData` - information about the source token and chain. This property contains details about the token being swapped and the chain it originates from.
-- `to`: `SwapDirectionData` - information about the destination token and chain. This property provides details about the token that will be received after the swap and the chain it will be sent to.
-- `steps`: `Array<RouteStep | RouteBaseStep>` - an array of routing steps. This property contains the sequence of steps that will be executed during the routing process, detailing how the swap will be carried out.
+- `from`: `ISwapDirectionData` - information about the source token and chain. This property contains details about the token being swapped and the chain it originates from.
+- `to`: `ISwapDirectionData` - information about the destination token and chain. This property provides details about the token that will be received after the swap and the chain it will be sent to.
+- `steps`: `Array<IRouteStep | IRouteBaseStep>` - an array of routing steps. This property contains the sequence of steps that will be executed during the routing process, detailing how the swap will be carried out.
 
 ## Enums
 

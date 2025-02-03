@@ -23,7 +23,7 @@ Retrieves a route for a given set of parameters. The route is an object that con
 
 #### Return Type
 
-- `Promise<RouteType | undefined>`
+- `Promise<IRouteType | undefined>`
 
 #### Error Types
 
@@ -63,7 +63,7 @@ Retrieves a list of supported tokens for a given chain ID, name, symbol, and lim
 
 #### Return Type
 
-- `Promise<LancaToken[] | undefined>`
+- `Promise<ILancaToken[] | undefined>`
 
 #### Example
 
@@ -85,7 +85,7 @@ Retrieves a list of supported chains.
 
 #### Return Type
 
-- `Promise<LancaChain[] | undefined>`
+- `Promise<ILancaChain[] | undefined>`
 
 #### Example
 
@@ -107,7 +107,7 @@ Retrieves the status of a route for a given transaction hash.
 
 #### Return Type
 
-- `Promise<TxStep[] | undefined>`
+- `Promise<ITxStep[] | undefined>`
 
 #### Example
 
@@ -125,7 +125,7 @@ Executes a previously retrieved route using the provided execution configuration
 
 #### Parameters
 
-- `route` : `RouteType`. The route object retrieved from `getRoute`
+- `route` : `IRouteType`. The route object retrieved from `getRoute`
 - `executionConfigs` : `ExecutionConfigs`. The execution configurations for the swap
   - `switchChainHook?`: `SwitchChainHook`. The hook to switch chain
   - `updateRouteStatusHook?` : `UpdateRouteHook`. The hook to update route status
@@ -133,7 +133,7 @@ Executes a previously retrieved route using the provided execution configuration
 
 #### Return Type
 
-- `Promise<RouteType | undefined>`
+- `Promise<IRouteType | undefined>`
 
 #### Example
 
