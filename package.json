@@ -5,7 +5,8 @@
 	"scripts": {
 		"dev": "vocs dev",
 		"build": "vocs build",
-		"preview": "vocs preview"
+		"preview": "vocs preview",
+		"format:fix": "prettier --write ."
 	},
 	"dependencies": {
 		"@types/react": "latest",
@@ -15,5 +16,14 @@
 		"typescript": "latest",
 		"vite": "6.0.5",
 		"vocs": "latest"
+	},
+	"devDependencies": {
+		"husky": "^9.1.7",
+		"prettier": "^3.4.2"
+	},
+	"husky": {
+		"hooks": {
+			"pre-commit": "npm run format:fix && npm run build"
+		}
 	}
 }
