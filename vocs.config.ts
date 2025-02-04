@@ -7,7 +7,7 @@ export default defineConfig({
 		light: 'logo/lanca/Lanca_logo=whiteBG.svg',
 		dark: 'logo/lanca/Lanca_logo=darkBG.svg',
 	},
-	rootDir: 'docs',
+	rootDir: '.',
 	iconUrl: 'logo/lanca/favicon.ico',
 	sidebar: [
 		{
