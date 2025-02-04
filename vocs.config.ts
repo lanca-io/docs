@@ -15,8 +15,8 @@ export default defineConfig({
 			link: '/getting-started',
 		},
 		{
-			text: 'Supported Chains',
-			link: '/supported-chains',
+			text: 'Contract Deployments',
+			link: '/deployments',
 		},
 		{
 			text: 'Methods',
