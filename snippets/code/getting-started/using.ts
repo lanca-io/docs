@@ -26,8 +26,8 @@ const supportedTokens = await lancaClient.getSupportedTokens({
 const route = await lancaClient.getRoute({
 	fromChainId: '137', // polygon
 	toChainId: '8453', //  base
-	fromToken: 'USDC',
-	toToken: 'WETH',
+	fromToken: '0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359', // USDC
+	toToken: '0x4200000000000000000000000000000000000006', //WETH
 	amount: '10',
 	fromAddress: '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619',
 	toAddress: '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619',
