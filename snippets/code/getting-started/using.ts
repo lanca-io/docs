@@ -7,8 +7,8 @@ const config: ILancaClientConfig = {
 	integratorAddress: 'YOUR_INTEGRATOR_ADDRESS',
 	feeBps: 1,
 	chains: {
-		1: ['https://rpc.ankr.com/eth', 'https://eth.llamarpc.com'],
-		137: ['https://polygon.llamarpc.com'],
+		137: ['https://polygon-rpc.com', 'https://rpc.ankr.com/polygon'],
+		8453: ['https://mainnet.base.org', 'https://base-rpc.publicnode.com'],
 	},
 }
 // [!endregion config]
