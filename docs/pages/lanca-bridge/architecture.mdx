@@ -1,0 +1,16 @@
+# Lanca Bridge Architecture
+
+The architecture of Lanca Bridge is divided into two main components:
+
+1. **Execution Layer**  
+2. **Settlement Layer**
+
+## Execution Layer
+
+The primary execution layer is built on **Concero Messaging**. This layer handles cross-chain communication by sending messages between Lanca Bridge contracts deployed on different chains. Upon receiving a message on the target chain, the Lanca Bridge contract triggers the associated integrator contract, which then provides liquidity from its pool to fulfill the requested operation.
+
+## Settlement Layer
+
+The settlement layer utilizes **Chainlink CCIP** (Cross-Chain Interoperability Protocol). Over time, Lanca Bridge accumulates liquidity on the source chain. Once a certain threshold is reached, the protocol sends this liquidity to the destination chain to replenish the amounts that were allocated during the Execution Layer phase. 
+
+In cases where an issue occurs during the Execution Layer, the client will still receive their funds once the Settlement Layer is triggered and completes its process on the destination chain. This design ensures that even if cross-chain message execution encounters problems, the protocol’s settlement mechanism will ultimately restore and deliver the correct liquidity on the destination chain. Leveraging Chainlink CCIP for settlement adds a reliable and secure mechanism for transferring liquidity between chains

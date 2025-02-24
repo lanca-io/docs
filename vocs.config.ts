@@ -11,21 +11,41 @@ export default defineConfig({
 	iconUrl: '/logo/lanca/favicon.ico',
 	sidebar: [
 		{
-			text: 'Getting Started',
-			link: '/getting-started',
+			text: 'Lanca bridge',
+			collapsed: false,
+			items: [
+				{
+					text: 'Overview',
+					link: '/lanca-bridge/overview',
+				},
+				{
+					text: 'Architecture',
+					link: '/lanca-bridge/architecture',
+				},
+				{
+					text: 'Interface',
+					link: '/lanca-bridge/interface',
+				}
+			]
 		},
 		{
-			text: 'Contract Deployments',
-			link: '/deployments',
-		},
-		{
-			text: 'Methods',
-			link: '/methods',
-		},
-		{
-			text: 'Types',
-			link: '/types',
-		},
+			text: 'SDK',
+			collapsed: false,
+			items: [
+				{
+					text: 'Getting Started',
+					link: '/getting-started',
+				},
+				{
+					text: 'Methods',
+					link: '/sdk/methods',
+				},
+				{
+					text: 'Types',
+					link: '/sdk/types',
+				},
+			],
+		}
 	],
 	topNav: [
 		{

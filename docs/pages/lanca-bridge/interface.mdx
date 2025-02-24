@@ -1,0 +1,66 @@
+# Interface
+
+## bridge
+
+```solidity
+function bridge(BridgeReq calldata bridgeReq) external returns (bytes32)
+```
+
+Performs a cross-chain transfer of tokens from the source chain to the destination chain.
+
+#### Parameters
+##### struct BridgeReq
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | amount of tokens to transfer |
+| token | address | address of the token to transfer |
+| feeToken | address | address of the token to pay the fee |
+| receiver | address | address of the receiver on the destination chain |
+| fallbackReceiver | address | address of the fallback receiver on the dst chain in case of failure execution layer. A bridge token will simply be sent to this address, no function will be called on it |
+| dstChainSelector | uint64 | selector of the destination chain |
+| dstChainGasLimit | uint32 | gas limit for the destination chain |
+| message | bytes | message to send to the destination chain |
+
+## getFee
+
+```solidity
+function getFee(uint64 dstChainSelector, uint256 amount, address feeToken, uint32 dstChainGasLimit) public view returns (uint256)
+```
+#### Parameters
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| dstChainSelector | uint64 | selector of the destination chain |
+| amount | uint256 | amount of tokens to transfer |
+| feeToken | address | address of the token to pay the fee |
+| dstChainGasLimit | uint32 | gas limit for the destination chain |
+
+## getBridgeFeeBreakdown
+
+```solidity
+function getBridgeFeeBreakdown(uint64 dstChainSelector, uint256 amount, address feeToken, uint32 dstChainGasLimit) public view returns (uint256, uint256, uint256)
+```
+
+#### Parameters
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| dstChainSelector | uint64 | selector of the destination chain |
+| amount | uint256 | amount of tokens to transfer |
+| feeToken | address | address of the token to pay the fee |
+| dstChainGasLimit | uint32 | gas limit for the destination chain |
+
+
+## Types
+
+### BridgeReq
+```solidity
+    struct BridgeReq {
+        uint256 amount;
+        address token;
+        address feeToken;
+        address receiver;
+        address fallbackReceiver;
+        uint64 dstChainSelector;
+        uint32 dstChainGasLimit;
+        bytes message;
+    }
+```
