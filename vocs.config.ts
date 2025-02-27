@@ -25,6 +25,10 @@ export default defineConfig({
 				{
 					text: 'Interface',
 					link: '/lanca-bridge/interface',
+				},
+				{
+					text: 'Deployments',
+					link: '/lanca-bridge/deployments',
 				}
 			]
 		},
