@@ -35,7 +35,9 @@ To use the Lanca SDK, you need to create a configuration object. Here is an exam
 // [!include ~/snippets/code/getting-started/using.ts:config]
 ```
 
-Replace `YOUR_INTEGRATOR_ADDRESS` with your actual integrator address.
+Replace `YOUR_INTEGRATOR_ADDRESS` with the actual address of the integrator. Collected fees are accumulated in the Lanca Orchestrator contract and can only be withdrawn by the integrator.
+
+Set `feeBps` as the desired fee rate in basis points (bps). This fee is applied in addition to the Lanca fee.
 
 ### Creating a LancaClient
 
