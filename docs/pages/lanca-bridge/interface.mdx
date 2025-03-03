@@ -21,6 +21,31 @@ Performs a cross-chain transfer of tokens from the source chain to the destinati
 | dstChainGasLimit | uint32 | gas limit for the destination chain |
 | message | bytes | message to send to the destination chain |
 
+## _lancaBridgeReceive
+
+```solidity
+function _lancaBridgeReceive(LancaBridgeMessage calldata message) internal
+```
+
+To receive messages on the destination chain, your contract must inherit from the [LancaBridgeClient](https://github.com/lanca-io/bridge-contracts/blob/release/contracts/LancaBridgeClient/LancaBridgeClient.sol) contract. Within this client contract, the lancaBridgeReceive function is invoked, which enforces that _lancaBridgeReceive can only be called by the LancaBridge contract, ensuring secure and authorized processing.
+
+:::warning
+    ⚠️ Warning
+    
+    Integrators must implement this function on their destination chain contract to properly handle the bridge message. Without a correct implementation, the token transfer will not complete. If the execution of lancaBridgeReceive fails, the token will be automatically transferred to the fallbackReceiver address specified in the BridgeReq structure after several hours, without invoking any function on that address.
+:::
+
+#### Parameters
+##### struct LancaBridgeMessage
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | bytes32 | a unique identifier for the bridge message, used for tracking and preventing replay attacks by ensuring that the same message is not processed multiple times |
+| sender | address | the address of the sender on the source chain who initiated the cross-chain transfer |
+| token | address | the address of the token being transferred across chains |
+| amount | uint256 | the amount of tokens involved in the transfer |
+| srcChainSelector | uint64 | the identifier of the source chain from which the message originates |
+| data | bytes | additional data that may include instructions or parameters required for further processing of the transfer on the destination chain |
+
 ## getFee
 
 ```solidity
@@ -62,5 +87,17 @@ function getBridgeFeeBreakdown(uint64 dstChainSelector, uint256 amount, address 
         uint64 dstChainSelector;
         uint32 dstChainGasLimit;
         bytes message;
+    }
+```
+
+### LancaBridgeMessage
+```solidity
+    struct LancaBridgeMessage {
+        bytes32 id;
+        address sender;
+        address token;
+        uint256 amount;
+        uint64 srcChainSelector;
+        bytes data;
     }
 ```
