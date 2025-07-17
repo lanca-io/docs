@@ -1,4 +1,6 @@
 import { defineConfig } from 'vocs'
+import remarkMath from 'remark-math'
+import rehypeKatex from 'rehype-katex'
 
 export default defineConfig({
 	title: 'LancaSDK Docs',
@@ -9,6 +11,10 @@ export default defineConfig({
 	},
 	rootDir: 'docs',
 	iconUrl: '/logo/lanca/favicon.ico',
+	markdown: {
+		remarkPlugins: [remarkMath],
+		rehypePlugins: [rehypeKatex]
+	},
 	sidebar: [
 		{
 			text: 'Lanca bridge',
@@ -33,6 +39,24 @@ export default defineConfig({
 			]
 		},
 		{
+			text: 'Lanca Bridging Framework',
+			collapsed: false,
+			items: [
+				{
+					text: 'Overview',
+					link: '/lbf/overview',
+				},
+				{
+					text: 'Architecture',
+					link: '/lbf/architecture',
+				},
+				{
+					text: 'Glossary',
+					link: '/lbf/glossary',
+				},
+			],
+		},
+		{
 			text: 'SDK',
 			collapsed: false,
 			items: [
@@ -49,7 +73,7 @@ export default defineConfig({
 					link: '/sdk/types',
 				},
 			],
-		}
+		},
 	],
 	topNav: [
 		{

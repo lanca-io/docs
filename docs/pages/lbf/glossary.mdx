@@ -1,0 +1,36 @@
+---
+title: Glossary
+description: Key terms and abbreviations used in LBF.
+---
+
+# Glossary
+
+**LBF (Lanca Bridging Framework)** — decentralized cross-chain liquidity framework enabling value movement between networks with high capital efficiency and security.
+
+**Parent Pool** — central liquidity pool (Master chain) that accepts LP deposits, performs batch withdrawals, and manages Child pool target balances.
+
+**Child Pool** — local pool on a destination network providing instant settlement liquidity and participating in IOU-based rebalancing.
+
+**LancaBridge** — smart contracts through which users initiate and complete cross-chain transfers.
+
+**ConceroRouter / Concero V2 Messaging** — secure cross-chain message & instruction transport used by LBF.
+
+**ConceroPriceFeed** — price oracle for fair cross-asset settlement calculations.
+
+**LancaKeeper** — automated operator handling periodic tasks: liquidity snapshots, batch deposits, batch withdrawals, and withdrawal finalization.
+
+**Rebalancer** — independent participant who supplies capital to deficit pools and extracts from surplus pools via an IOU system in exchange for rewards.
+
+**IOU (I-Owe-You Token)** — tokenized claim issued when a Rebalancer deposits into a deficit pool; redeemable from a surplus pool (subject to Surplus status) for underlying assets + fee.
+
+**targetBalance** — liquidity goal for a pool assigned by the Parent Pool based on network activity and algorithmic metrics.
+
+**activeLiquidity** — working capital of a pool: `balance - rebalancingFees`; used to classify Surplus/Balanced/Deficit.
+
+**Liquidity Utilisation Ratio (LUR)** — (Inflow + Outflow) / `targetBalance`; activity metric.
+
+**Net Drain Rate (NDR)** — (Outflow − Inflow) / `targetBalance`; liquidity stress metric.
+
+**Liquidity Health Score (LHS)** — aggregate health metric combining LUR and NDR (0.7/0.3 weighting in the initial iteration).
+
+**Progressive Reward Model** — sub-linear, time-sensitive bounty curve for Rebalancers, DAO-configurable and designed for sustainable incentives during extended deficits.
