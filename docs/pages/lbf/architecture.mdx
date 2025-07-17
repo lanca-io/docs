@@ -7,11 +7,11 @@ import Math from '../../components/Math';
 
 # LBF Architecture Overview
 
-LBF implements a modular architecture that separates **liquidity management** from **operational settlement/messaging logic** across a *Parent Pool* (Master chain) and multiple *Child Pools* deployed to target networks. This reduces the need for mirrored capital on every chain and improves capital efficiency.
+Lanca Bridging Framework is a fully decentralised cross-chain bridging framework enabling seamless value transfer across different blockchain networks.
 
 The central *Parent Pool* is the primary entry/exit point for liquidity providers (LPs), while *Child Pools* provide instant local settlement and application-facing liquidity on their respective chains. Child pool states are periodically reported back to the Parent pool.
 
-Interchain communication is handled by **Concero V2 Messaging**, and periodic operational orchestration (liquidity snapshots, batch withdrawals) is driven by **LancaKeeper**.
+Interchain communication is handled by **Concero V2 Messaging**, and periodic operational orchestration (liquidity snapshots, batch withdrawals and deposits) is driven by **LancaKeeper**.
 
 LBF supports a **hybrid liquidity management model**: an automated planning layer (Parent-assigned targetBalance) is complemented by a market layer — **Rebalancers**, who earn fees by correcting deficits/surpluses through an IOU mechanism.
 
