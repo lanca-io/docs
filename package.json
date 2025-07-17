@@ -15,7 +15,8 @@
 		"remark-math": "^6.0.0",
 		"typescript": "latest",
 		"vite": "6.0.5",
-		"vocs": "1.0.13"
+		"vocs": "1.0.13",
+		"acorn": "8.14.0"
 	},
 	"devDependencies": {
 		"@types/react": "latest",

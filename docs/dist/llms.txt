@@ -1,0 +1,13 @@
+# Lanca Docs
+
+> Lanca Bridge Documentation
+
+## Docs
+
+- [Get started](/getting-started): Welcome to the Lanca SDK documentation! This page will guide you through the process of getting started with the Lanca SDK.
+- [Lanca Bridge Architecture](/v1/lanca-bridge/architecture): The architecture of Lanca Bridge is divided into two main components:
+- [Contract Deployments](/v1/lanca-bridge/deployments): Arbitrum: [0x4459d95b396c418B2144943910E2e68548fFE589](https://arbiscan.io/address/0x4459d95b396c418B2144943910E2e68548fFE589)
+- [Interface](/v1/lanca-bridge/interface): Performs a cross-chain transfer of tokens from the source chain to the destination chain.
+- [Overview](/v1/lanca-bridge/overview): Lanca Bridge is a cross-chain infrastructure that enables the transfer of value from one chain to another. Under the hood, it uses Concero Messaging as the execution layer and CCIP as the settlement layer.
+- [LancaSDK](/v1/sdk/methods): The `LancaClient` class provides a set of methods for interacting with the Lanca API.
+- [Data Types](/v1/sdk/types): A type representing a configuration for RPC.
