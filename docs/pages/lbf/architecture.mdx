@@ -3,6 +3,7 @@ title: Architecture Overview
 description: High-level view of the LBF architecture — roles, flows, data model.
 ---
 
+import Math from '../../components/Math';
 
 # LBF Architecture Overview
 
@@ -61,17 +62,18 @@ An LP sends assets to the Parent Pool → LP share tokens are minted proportiona
 
 **LP Share:**
 
-$$
+<Math input="$$
 \text{LP Share} = \frac{\text{User Deposit}}{\text{Total Pool Value}} \times 100\%
-$$
+$$"/>
+
 
 **Share Token Mint Formula:**
 
-$$
+<Math input="$$
 \text{Share Tokens} =
 \frac{\text{Deposit Amount} \times \text{Current Total Share Tokens}}
 {\text{Current Pool Value}}
-$$
+$$"/>
 
 ### 2. User Cross-Chain Transfer
 
@@ -106,9 +108,9 @@ For each pool the following are tracked:
 
 Comparing `activeLiquidity` to `targetBalance` yields one of three states: **Surplus**, **Balanced**, **Deficit**. These states govern which Rebalancer actions are allowed.
 
-$$
+<Math input="$$
 \text{activeLiquidity} = \text{balance} - \text{rebalancingFees}
-$$
+$$"/>
 
 ### Monitoring Cycle
 
@@ -130,44 +132,44 @@ To optimize capital allocation, the Parent Pool periodically recalculates each C
 
 ### Liquidity Utilisation Ratio (LUR)
 
-$$
+<Math input="$$
 \text{LUR} = \frac{\text{Inflow} + \text{Outflow}}{\text{targetBalance}}
-$$
+$$"/>
 
 Measures transaction intensity relative to the pool’s target. Higher volume vs target → higher utilization pressure.
 
 **Normalization:**
 
-$$
+<Math input="$$
 \text{LURScore} = 1 - \frac{\text{LUR}}{K + \text{LUR}}
-$$
+$$"/>
 
 Sensitivity parameter \(K\) controls how quickly the score falls as activity rises.
 
 ### Net Drain Rate (NDR)
 
-$$
+<Math input="$$
 \text{NDR} = \frac{\text{Outflow} - \text{Inflow}}{\text{targetBalance}}
-$$
+$$"/>
 
 Positive → net outflow (stress). Zero/negative → stable or net inflow.
 
 **Score:**
 
-$$
+<Math input="$$
 \text{NDRScore} =
 \begin{cases}
 1, & \text{if } \text{NDR} \le 0 \\
 \max(0, 1 - \text{NDR}), & \text{if } \text{NDR} > 0
 \end{cases}
-$$
+$$"/>
 
 ### Liquidity Health Score (LHS)
 Weighted aggregate of LUR and NDR:
 
-$$
+<Math input="$$
 \text{LHS} = W_1 \times \text{LURScore} + W_2 \times \text{NDRScore}
-$$
+$$"/>
 
 ### Recomputing targetBalance
 
@@ -175,15 +177,11 @@ $$
 Lower LHS → higher priority for capital allocation. Alpha is a sensitivity constant.
 
 2. **Intermediate Pool Weight \(W_i\):**
-$$
-W_i = \text{Original targetBalance}_i \times f(\text{LHS}_i)
-$$
+
+<Math input="$$W_i = \text{Original targetBalance}_i \times f(\text{LHS}_i)$$"/>
 
 3. **Normalized Redistribution:**
-$$
-\text{New targetBalance}_i =
-\frac{W_i}{\sum_{j=1}^{N} W_j} \times \text{Total Liquidity}
-$$
+<Math input="$$\text{New targetBalance}_i = \frac{W_i}{\sum_{j=1}^{N} W_j} \times \text{Total Liquidity}$$"/>
 
 System-wide liquidity remains constant.
 

@@ -5,6 +5,9 @@
 ## Docs
 
 - [Get started](/getting-started): Welcome to the Lanca SDK documentation! This page will guide you through the process of getting started with the Lanca SDK.
+- [LBF Architecture Overview](/lbf/architecture): LBF implements a modular architecture that separates **liquidity management** from **operational settlement/messaging logic** across a *Parent Pool* (Master chain) and multiple *Child Pools* deployed to target networks. This reduces the need for mirrored capital on every chain and improves capital efficiency.
+- [Glossary](/lbf/glossary): **LBF (Lanca Bridging Framework)** — decentralized cross-chain liquidity framework enabling value movement between networks with high capital efficiency and security.
+- [Lanca Bridging Framework (LBF)](/lbf/overview): **Lanca Bridging Framework (LBF)** is a fully decentralized cross-chain framework that enables seamless value transfer across blockchain networks by combining a *Parent-Child Pool* model, a dynamic IOU system, and hybrid liquidity management. The goal: eliminate liquidity fragmentation, improve capital efficiency, and scale interchain operations without compromising on security or decentralization.
 - [Lanca Bridge Architecture](/v1/lanca-bridge/architecture): The architecture of Lanca Bridge is divided into two main components:
 - [Contract Deployments](/v1/lanca-bridge/deployments): Arbitrum: [0x4459d95b396c418B2144943910E2e68548fFE589](https://arbiscan.io/address/0x4459d95b396c418B2144943910E2e68548fFE589)
 - [Interface](/v1/lanca-bridge/interface): Performs a cross-chain transfer of tokens from the source chain to the destination chain.

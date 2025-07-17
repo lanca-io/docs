@@ -84,6 +84,123 @@ This is just a basic example to get you started. For more information on the Lan
 ::::
 
 
+import Math from '../../components/Math';
+
+## LBF Architecture Overview
+
+LBF implements a modular architecture that separates **liquidity management** from **operational settlement/messaging logic** across a *Parent Pool* (Master chain) and multiple *Child Pools* deployed to target networks. This reduces the need for mirrored capital on every chain and improves capital efficiency.
+
+The central *Parent Pool* is the primary entry/exit point for liquidity providers (LPs), while *Child Pools* provide instant local settlement and application-facing liquidity on their respective chains. Child pool states are periodically reported back to the Parent pool.
+
+Interchain communication is handled by **Concero V2 Messaging**, and periodic operational orchestration (liquidity snapshots, batch withdrawals) is driven by **LancaKeeper**.
+
+LBF supports a **hybrid liquidity management model**: an automated planning layer (Parent-assigned targetBalance) is complemented by a market layer — **Rebalancers**, who earn fees by correcting deficits/surpluses through an IOU mechanism.
+
+### Architecture Diagram
+
+![lbf](../lbfMainDiagram.png)
+
+**Core Components:** Parent Pool, Child Pool, LancaBridge (transfer initiator/executor contracts), ConceroRouter (cross-chain message router), ConceroPriceFeed (price oracle), LancaKeeper (automated operator), Rebalancers (market participants performing liquidity balancing).
+
+### System Components
+
+#### Parent Pool (Master Chain)
+
+Primary liquidity hub: accepts LP deposits, mints LP share tokens proportionate to pool ownership, processes batch withdrawals, and computes dynamic `targetBalance` values for all Child Pools.
+
+The Parent Pool updates liquidity targets based on network activity and Child pool state reports (metrics + balances). Target distribution instructions are dispatched via Concero V2 Messaging.
+
+#### Child Pool
+
+Local liquidity pool on a destination chain: holds funds for immediate settlement of transfers, periodically reports state back to the Parent Pool, and participates in Rebalancer deposit/withdraw (IOU) operations.
+
+#### LancaBridge
+
+Contracts on source and destination chains that users call to initiate cross-chain transfers. They assemble the cross-chain payload, and relay it through the ConceroRouter. On the destination chain, the payload is validated and executed—either disbursing funds to the user or invoking the specified downstream contract.
+
+#### ConceroRouter (Concero V2 Messaging)
+
+Secure delivery of cross-chain messages/instructions ensuring Parent↔Child consistency, IOU burn/mint, and interchain contract calls. Cryptographic and economic security properties come from Concero Messaging.
+
+#### LancaKeeper
+
+Automated (off-chain + privileged on-chain) operator that:
+
+1. Triggers periodic Child pool liquidity snapshots;
+2. Initiates batch deposits/withdrawals at the Parent Pool;
+3. Finalizes withdrawals once consolidated liquidity is available.
+
+#### Rebalancers
+
+Independent actors who monitor pool status (`activeLiquidity` vs `targetBalance`) and quickly fill deficits (deposit) or remove surplus (withdraw) in exchange for **IOU** claims that can later be redeemed from surplus pools (with fee).
+
+IOU redemption is permitted only from pools operating above their `targetBalance` — protecting operational liquidity. If a chosen pool is not in surplus, the Rebalancer must wait or select another pool for redemption.
+
+### Operational Flows in LBF
+
+#### 1. LP Liquidity Deposit → Parent Pool
+
+An LP sends assets to the Parent Pool → LP share tokens are minted proportionally (see formulas below) → aggregate pool value is updated → `targetBalance` values for Child Pools may be adjusted.
+
+**LP Share:**
+
+<Math
+  input="$$
+\text{LP Share} = \frac{\text{User Deposit}}{\text{Total Pool Value}} \times 100\%
+$$"
+/>
+
+
+## Glossary
+
+**LBF (Lanca Bridging Framework)** — decentralized cross-chain liquidity framework enabling value movement between networks with high capital efficiency and security.
+
+**Parent Pool** — central liquidity pool (Master chain) that accepts LP deposits, performs batch withdrawals, and manages Child pool target balances.
+
+**Child Pool** — local pool on a destination network providing instant settlement liquidity and participating in IOU-based rebalancing.
+
+**LancaBridge** — smart contracts through which users initiate and complete cross-chain transfers.
+
+**ConceroRouter / Concero V2 Messaging** — secure cross-chain message & instruction transport used by LBF.
+
+**ConceroPriceFeed** — price oracle for fair cross-asset settlement calculations.
+
+**LancaKeeper** — automated operator handling periodic tasks: liquidity snapshots, batch deposits, batch withdrawals, and withdrawal finalization.
+
+**Rebalancer** — independent participant who supplies capital to deficit pools and extracts from surplus pools via an IOU system in exchange for rewards.
+
+**IOU (I-Owe-You Token)** — tokenized claim issued when a Rebalancer deposits into a deficit pool; redeemable from a surplus pool (subject to Surplus status) for underlying assets + fee.
+
+**targetBalance** — liquidity goal for a pool assigned by the Parent Pool based on network activity and algorithmic metrics.
+
+**activeLiquidity** — working capital of a pool: `balance - rebalancingFees`; used to classify Surplus/Balanced/Deficit.
+
+**Liquidity Utilisation Ratio (LUR)** — (Inflow + Outflow) / `targetBalance`; activity metric.
+
+**Net Drain Rate (NDR)** — (Outflow − Inflow) / `targetBalance`; liquidity stress metric.
+
+**Liquidity Health Score (LHS)** — aggregate health metric combining LUR and NDR (0.7/0.3 weighting in the initial iteration).
+
+**Progressive Reward Model** — sub-linear, time-sensitive bounty curve for Rebalancers, DAO-configurable and designed for sustainable incentives during extended deficits.
+
+
+## Lanca Bridging Framework (LBF)
+
+**Lanca Bridging Framework (LBF)** is a fully decentralized cross-chain framework that enables seamless value transfer across blockchain networks by combining a *Parent-Child Pool* model, a dynamic IOU system, and hybrid liquidity management. The goal: eliminate liquidity fragmentation, improve capital efficiency, and scale interchain operations without compromising on security or decentralization.
+
+LBF relies on **Concero V2 Messaging** as the secure transport for interchain messages/instructions and uses automated operators (**LancaKeeper**), independent participants (**Rebalancers**), and a price oracle (**ConceroPriceFeed**) to maintain correct and efficient pool states across networks.
+
+### Key Advantages
+
+* Unified liquidity layer: LPs deposit once (into the *Parent Pool*) and get fee exposure across all supported chains.
+* Dynamically allocated liquidity via per-chain `targetBalance` values that adapt to network demand.
+* IOU mechanism incentivizes fast Rebalancer response to liquidity deficits without over-parking capital.
+* Flexible, configurable reward system for underserved chains (Progressive Reward Model).
+* Multi-layer security model (cryptographic, economic, operational monitoring).
+
+***
+
+
 ## Lanca Bridge Architecture
 
 The architecture of Lanca Bridge is divided into two main components:

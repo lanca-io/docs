@@ -1,28 +1,29 @@
 // [!region config]
 import { LancaClient } from '@lanca/sdk'
 import type { ILancaClientConfig, IChainWithProvider } from '@lanca/sdk'
-import { createWalletClient } from 'viem'
+import { createWalletClient, http } from 'viem'
 import { polygon, base } from 'viem/chains'
 
 const config: ILancaClientConfig = {
-    integratorAddress: 'YOUR_INTEGRATOR_ADDRESS',
-    feeBps: 1n,
-    chains: {
-        '137': {
-            chain: polygon,
-            provider: http(),
-        },
-        '8453': {
-            chain: base,
-            provider: http(),
-        }
-    } as Record<string, IChainWithProvider>,
-};
+	integratorAddress: 'YOUR_INTEGRATOR_ADDRESS',
+	feeBps: 1n,
+	chains: {
+		'137': {
+			chain: polygon,
+			provider: http(),
+		},
+		'8453': {
+			chain: base,
+			provider: http(),
+		},
+	} as Record<string, IChainWithProvider>,
+}
 // [!endregion config]
 
 // [!region sdk]
 const lancaClient = new LancaClient(config)
 // [!endregion sdk]
+// Example: Get supported chains and tokens
 const supportedChains = await lancaClient.getSupportedChains()
 const supportedTokens = await lancaClient.getSupportedTokens({
 	chainId: '137',
@@ -50,10 +51,10 @@ const walletClient = createWalletClient({
 
 const executionConfig: IExecutionConfig = {
 	switchChainHook: async (chainId: number) => {
-		console.log(chainId);
+		console.log(chainId)
 	},
 	updateRouteStatusHook: (route: IRouteType) => console.log(route),
-};
+}
 
 const routeWithStatus = await lancaClient.executeRoute(route, walletClient, executionConfig)
 // [!endregion executeRoute]

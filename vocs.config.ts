@@ -1,6 +1,4 @@
 import { defineConfig } from 'vocs'
-import remarkMath from 'remark-math'
-import rehypeKatex from 'rehype-katex'
 
 export default defineConfig({
 	title: 'Lanca Docs',
@@ -17,10 +15,6 @@ export default defineConfig({
 	},
 	rootDir: 'docs',
 	iconUrl: '/logo/lanca/favicon.ico',
-	markdown: {
-		remarkPlugins: [remarkMath],
-		rehypePlugins: [rehypeKatex]
-	},
 	sidebar: [
 		{
 			text: 'V1',
@@ -85,7 +79,7 @@ export default defineConfig({
 					link: '/lbf/glossary',
 				},
 			],
-		}
+		},
 	],
 	topNav: [
 		{
