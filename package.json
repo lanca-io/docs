@@ -9,17 +9,17 @@
 		"format:fix": "prettier --write ."
 	},
 	"dependencies": {
-		"@types/react": "latest",
-		"acorn": "8.14.0",
 		"react": "latest",
 		"react-dom": "latest",
 		"rehype-katex": "^7.0.1",
 		"remark-math": "^6.0.0",
 		"typescript": "latest",
 		"vite": "6.0.5",
-		"vocs": "latest"
+		"vocs": "1.0.13"
 	},
 	"devDependencies": {
+		"typescript": "latest",
+		"@types/react": "latest",
 		"husky": "^9.1.7",
 		"prettier": "^3.4.2"
 	},
