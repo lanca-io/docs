@@ -1,2 +1,2 @@
 const lancaClient = new LancaClient(config)
-const supportedChains = await lanca.getSupportedChains()
+const supportedChains = await lancaClient.getSupportedChains()

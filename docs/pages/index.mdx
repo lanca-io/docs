@@ -5,16 +5,16 @@ layout: landing
 import { HomePage } from 'vocs/components'
 
 <HomePage.Root>
-	<HomePage.Tagline>LancaSDK Docs</HomePage.Tagline>
-	<HomePage.InstallPackage name="@lanca/sdk" type="install" />
-	<HomePage.Description>Documentation of LancaSDK</HomePage.Description>
+	<HomePage.Tagline>Lanca Documentation</HomePage.Tagline>
+
+[//]: # (<HomePage.InstallPackage name="@lanca/sdk" type="install" />)
+	<HomePage.Description>Learn how to integrate Lanca into your dApp, a cross-chain bridging protocol powered by Concero Messaging.</HomePage.Description>
 	<HomePage.Buttons>
 		<HomePage.Button href="/getting-started" variant="accent">
 			Get started
 		</HomePage.Button>
-		<HomePage.Button href="/lanca-bridge/deployments">Contract Deployments</HomePage.Button>
-		<HomePage.Button href="/sdk/methods">Methods</HomePage.Button>
-		<HomePage.Button href="/sdk/types">Types</HomePage.Button>
+		<HomePage.Button href="/v1/lanca-bridge/deployments">Deployments</HomePage.Button>
 		<HomePage.Button href="https://github.com/lanca-io/sdk">GitHub</HomePage.Button>
 	</HomePage.Buttons>
+	<img src={"/Hero.png"} alt="Lanca SDK Hero Image" />
 </HomePage.Root>

@@ -1,0 +1,194 @@
+---
+title: Architecture Overview
+description: High-level view of the LBF architecture — roles, flows, data model.
+---
+
+import Math from '../../components/Math';
+
+# LBF Architecture Overview
+
+LBF implements a modular architecture that separates **liquidity management** from **operational settlement/messaging logic** across a *Parent Pool* (Master chain) and multiple *Child Pools* deployed to target networks. This reduces the need for mirrored capital on every chain and improves capital efficiency.
+
+The central *Parent Pool* is the primary entry/exit point for liquidity providers (LPs), while *Child Pools* provide instant local settlement and application-facing liquidity on their respective chains. Child pool states are periodically reported back to the Parent pool.
+
+Interchain communication is handled by **Concero V2 Messaging**, and periodic operational orchestration (liquidity snapshots, batch withdrawals) is driven by **LancaKeeper**.
+
+LBF supports a **hybrid liquidity management model**: an automated planning layer (Parent-assigned targetBalance) is complemented by a market layer — **Rebalancers**, who earn fees by correcting deficits/surpluses through an IOU mechanism.
+
+## Architecture Diagram
+
+![lbf](../lbfMainDiagram.png)
+
+**Core Components:** Parent Pool, Child Pool, LancaBridge (transfer initiator/executor contracts), ConceroRouter (cross-chain message router), ConceroPriceFeed (price oracle), LancaKeeper (automated operator), Rebalancers (market participants performing liquidity balancing).
+
+## System Components
+
+### Parent Pool (Master Chain)
+
+Primary liquidity hub: accepts LP deposits, mints LP share tokens proportionate to pool ownership, processes batch withdrawals, and computes dynamic `targetBalance` values for all Child Pools.
+
+The Parent Pool updates liquidity targets based on network activity and Child pool state reports (metrics + balances). Target distribution instructions are dispatched via Concero V2 Messaging.
+
+### Child Pool
+
+Local liquidity pool on a destination chain: holds funds for immediate settlement of transfers, periodically reports state back to the Parent Pool, and participates in Rebalancer deposit/withdraw (IOU) operations.
+
+### LancaBridge
+
+Contracts on source and destination chains that users call to initiate cross-chain transfers. They assemble the cross-chain payload, and relay it through the ConceroRouter. On the destination chain, the payload is validated and executed—either disbursing funds to the user or invoking the specified downstream contract.
+
+### ConceroRouter (Concero V2 Messaging)
+
+Secure delivery of cross-chain messages/instructions ensuring Parent↔Child consistency, IOU burn/mint, and interchain contract calls. Cryptographic and economic security properties come from Concero Messaging.
+
+### LancaKeeper
+
+Automated (off-chain + privileged on-chain) operator that:
+1. Triggers periodic Child pool liquidity snapshots;
+2. Initiates batch deposits/withdrawals at the Parent Pool;
+3. Finalizes withdrawals once consolidated liquidity is available.
+
+### Rebalancers
+
+Independent actors who monitor pool status (`activeLiquidity` vs `targetBalance`) and quickly fill deficits (deposit) or remove surplus (withdraw) in exchange for **IOU** claims that can later be redeemed from surplus pools (with fee).
+
+IOU redemption is permitted only from pools operating above their `targetBalance` — protecting operational liquidity. If a chosen pool is not in surplus, the Rebalancer must wait or select another pool for redemption.
+
+## Operational Flows in LBF
+
+### 1. LP Liquidity Deposit → Parent Pool
+
+An LP sends assets to the Parent Pool → LP share tokens are minted proportionally (see formulas below) → aggregate pool value is updated → `targetBalance` values for Child Pools may be adjusted.
+
+**LP Share:**
+
+<Math input="$$
+\text{LP Share} = \frac{\text{User Deposit}}{\text{Total Pool Value}} \times 100\%
+$$"/>
+
+
+**Share Token Mint Formula:**
+
+<Math input="$$
+\text{Share Tokens} =
+\frac{\text{Deposit Amount} \times \text{Current Total Share Tokens}}
+{\text{Current Pool Value}}
+$$"/>
+
+### 2. User Cross-Chain Transfer
+
+1. User calls `bridge()` on the source-chain LancaBridge.
+2. ConceroRouter relays the message to the destination chain.
+3. Destination LancaBridge verifies the payload and executes payout (EOA or client contract).
+
+
+### 3. Real-Time Rebalancer Role
+
+A Rebalancer detects a Child pool deficit → deposits assets → receives IOU for the deposit amount → transfers IOU to a surplus chain (Concero V2 Messaging burn/mint) → redeems IOU for underlying assets + fee.
+
+### 4. LP Withdrawal Logic
+
+1. LP burns LP tokens in the Parent Pool to request withdrawal.
+2. The Parent Pool *temporarily raises* its `targetBalance` by the withdrawal amount, intentionally moving itself into a deficit state — an economic signal to Rebalancers.
+3. Rebalancers top up the Parent Pool toward the new target.
+4. Once actual balance meets target, LancaKeeper finalizes the withdrawal and transfers assets to the LP. Withdrawal time depends on system rebalancing speed, not a hard fixed delay.
+
+## Hybrid Liquidity Management
+
+The LBF architecture blends **centralized liquidity target planning** (Parent Pool) with **market-driven reactiveness** (Rebalancers), minimizing idle capital while preserving fast local settlement.
+
+### Pool Status Variables
+
+For each pool the following are tracked:
+
+- `balance`
+- `rebalancingFees`
+- `activeLiquidity = balance - rebalancingFees`
+- `targetBalance` (dynamic goal set by the Parent Pool)
+
+Comparing `activeLiquidity` to `targetBalance` yields one of three states: **Surplus**, **Balanced**, **Deficit**. These states govern which Rebalancer actions are allowed.
+
+<Math input="$$
+\text{activeLiquidity} = \text{balance} - \text{rebalancingFees}
+$$"/>
+
+### Monitoring Cycle
+
+The Parent Pool + LancaKeeper collect regular Child pool snapshots and adjust `targetBalance` in response to network activity. When a Child Pool drifts from its target, Rebalancers receive an economic signal to act.
+
+### Fast Rebalancer Adjustments
+
+Rebalancers provide a “fast lane” between major Parent pool redistribution cycles: they deposit into deficit pools and withdraw from surplus pools using IOUs. This two-layer approach shortens system response time to load spikes.
+
+### IOU Redemption Constraint
+
+IOU redemption is allowed only if the target pool’s balance exceeds its `targetBalance`, protecting operational liquidity and preventing depletion. Without surplus, the Rebalancer must wait or choose another pool.
+
+# Dynamic Liquidity Rebalancing Algorithm
+
+To optimize capital allocation, the Parent Pool periodically recalculates each Child pool’s `targetBalance` using a **Liquidity Health Score (LHS)** that aggregates usage and stress metrics. The objective: move capital from “overfunded” pools to “high-demand” pools while keeping total system liquidity constant.
+
+## Metrics
+
+### Liquidity Utilisation Ratio (LUR)
+
+<Math input="$$
+\text{LUR} = \frac{\text{Inflow} + \text{Outflow}}{\text{targetBalance}}
+$$"/>
+
+Measures transaction intensity relative to the pool’s target. Higher volume vs target → higher utilization pressure.
+
+**Normalization:**
+
+<Math input="$$
+\text{LURScore} = 1 - \frac{\text{LUR}}{K + \text{LUR}}
+$$"/>
+
+Sensitivity parameter \(K\) controls how quickly the score falls as activity rises.
+
+### Net Drain Rate (NDR)
+
+<Math input="$$
+\text{NDR} = \frac{\text{Outflow} - \text{Inflow}}{\text{targetBalance}}
+$$"/>
+
+Positive → net outflow (stress). Zero/negative → stable or net inflow.
+
+**Score:**
+
+<Math input="$$
+\text{NDRScore} =
+\begin{cases}
+1, & \text{if } \text{NDR} \le 0 \\
+\max(0, 1 - \text{NDR}), & \text{if } \text{NDR} > 0
+\end{cases}
+$$"/>
+
+### Liquidity Health Score (LHS)
+Weighted aggregate of LUR and NDR:
+
+<Math input="$$
+\text{LHS} = W_1 \times \text{LURScore} + W_2 \times \text{NDRScore}
+$$"/>
+
+### Recomputing targetBalance
+
+1. **Weighting Function:**
+Lower LHS → higher priority for capital allocation. Alpha is a sensitivity constant.
+
+2. **Intermediate Pool Weight \(W_i\):**
+
+<Math input="$$W_i = \text{Original targetBalance}_i \times f(\text{LHS}_i)$$"/>
+
+3. **Normalized Redistribution:**
+<Math input="$$\text{New targetBalance}_i = \frac{W_i}{\sum_{j=1}^{N} W_j} \times \text{Total Liquidity}$$"/>
+
+System-wide liquidity remains constant.
+
+## LBF Security
+
+The Parent-Child Pool architecture introduces a critical liquidity concentration at the Parent Pool, compromise at this level could cascade across all Child pools, so strict privilege controls and validation are required.
+
+Reliance on cross-chain communication (Concero V2 Messaging) means message integrity and authenticity are essential to settlement correctness and liquidity flows. Message validation failures could misdirect assets between chains.
+
+The IOU burn/mint mechanism is vulnerable to replay attacks unless strict cross-chain message *nonce* handling is enforced; reprocessing a valid message could double-mint IOUs and enable economic exploitation.

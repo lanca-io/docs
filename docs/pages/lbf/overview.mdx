@@ -1,0 +1,20 @@
+---
+title: Welcome to the Lanca Bridging Framework
+description: Start here for LBF — a decentralized cross-chain liquidity infrastructure.
+---
+
+# Lanca Bridging Framework (LBF)
+
+**Lanca Bridging Framework (LBF)** is a fully decentralized cross-chain framework that enables seamless value transfer across blockchain networks by combining a *Parent-Child Pool* model, a dynamic IOU system, and hybrid liquidity management. The goal: eliminate liquidity fragmentation, improve capital efficiency, and scale interchain operations without compromising on security or decentralization.
+
+LBF relies on **Concero V2 Messaging** as the secure transport for interchain messages/instructions and uses automated operators (**LancaKeeper**), independent participants (**Rebalancers**), and a price oracle (**ConceroPriceFeed**) to maintain correct and efficient pool states across networks.
+
+## Key Advantages
+
+- Unified liquidity layer: LPs deposit once (into the *Parent Pool*) and get fee exposure across all supported chains.
+- Dynamically allocated liquidity via per-chain `targetBalance` values that adapt to network demand.
+- IOU mechanism incentivizes fast Rebalancer response to liquidity deficits without over-parking capital.
+- Flexible, configurable reward system for underserved chains (Progressive Reward Model).
+- Multi-layer security model (cryptographic, economic, operational monitoring).
+
+---
