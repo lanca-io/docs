@@ -1,60 +1,72 @@
 import { defineConfig } from 'vocs'
 
 export default defineConfig({
-	title: 'LancaSDK Docs',
+	title: 'Lanca Docs',
+	titleTemplate: '%s – Lanca Docs',
 	baseUrl: 'https://docs.lanca.io',
+	description: 'Lanca Bridge Documentation',
 	logoUrl: {
 		light: '/logo/lanca/Lanca_logo=whiteBG.svg',
 		dark: '/logo/lanca/Lanca_logo=darkBG.svg',
+	},
+	editLink: {
+		pattern: 'https://github.com/lanca-io/docs/edit/master/docs/pages/:path',
+		text: 'Suggest changes to this page',
 	},
 	rootDir: 'docs',
 	iconUrl: '/logo/lanca/favicon.ico',
 	sidebar: [
 		{
-			text: 'Lanca bridge',
+			text: 'V1',
 			collapsed: false,
 			items: [
 				{
-					text: 'Overview',
-					link: '/lanca-bridge/overview',
+					text: 'Lanca Bridge',
+					collapsed: true,
+					items: [
+						{
+							text: 'Overview',
+							link: '/v1/lanca-bridge/overview',
+						},
+						{
+							text: 'Architecture',
+							link: '/v1/lanca-bridge/architecture',
+						},
+						{
+							text: 'Interface',
+							link: '/v1/lanca-bridge/interface',
+						},
+						{
+							text: 'Deployments',
+							link: '/v1/lanca-bridge/deployments',
+						},
+					],
 				},
 				{
-					text: 'Architecture',
-					link: '/lanca-bridge/architecture',
-				},
-				{
-					text: 'Interface',
-					link: '/lanca-bridge/interface',
-				},
-				{
-					text: 'Deployments',
-					link: '/lanca-bridge/deployments',
-				}
-			]
-		},
-		{
-			text: 'SDK',
-			collapsed: false,
-			items: [
-				{
-					text: 'Getting Started',
-					link: '/getting-started',
-				},
-				{
-					text: 'Methods',
-					link: '/sdk/methods',
-				},
-				{
-					text: 'Types',
-					link: '/sdk/types',
+					text: 'SDK',
+					collapsed: true,
+					items: [
+						{
+							text: 'Get Started',
+							link: '/getting-started',
+						},
+						{
+							text: 'Methods',
+							link: '/v1/sdk/methods',
+						},
+						{
+							text: 'Types',
+							link: '/v1/sdk/types',
+						},
+					],
 				},
 			],
-		}
+		},
 	],
 	topNav: [
 		{
-			text: 'Get in touch',
-			link: 'mailto:support@lanca.io',
+			text: 'LBF Whitepaper',
+			link: 'https://concero.io/lanca_whitepaper.pdf',
 		},
 	],
 	socials: [
