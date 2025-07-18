@@ -80,6 +80,20 @@ export default defineConfig({
 				},
 			],
 		},
+		{
+			text: 'Lanca Canonical Bridge',
+			collapsed: false,
+			items: [
+				{
+					text: 'Overview',
+					link: '/lanca-canonical-bridge/overview',
+				},
+				{
+					text: 'Architecture',
+					link: '/lanca-canonical-bridge/architecture',
+				},
+			],
+		},
 	],
 	topNav: [
 		{
