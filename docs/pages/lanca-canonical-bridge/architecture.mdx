@@ -97,7 +97,7 @@ Contracts must return the correct magic value to confirm successful processing:
 
 ```solidity
 require(
-    magicValue == ILancaCanonicalBridgeClient.lancaCanonicalBridgeReceive.selector,
+    expectedSelector == ILancaCanonicalBridgeClient.lancaCanonicalBridgeReceive.selector,
     ILancaCanonicalBridgeClient.CallFiled()
 );
 ```
