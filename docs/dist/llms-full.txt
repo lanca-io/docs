@@ -84,15 +84,134 @@ This is just a basic example to get you started. For more information on the Lan
 ::::
 
 
+import Math from '../../components/Math'
+
+## Lanca Canonical Bridge Architecture
+
+Lanca Canonical Bridge implements a canonical bridging architecture that ensures 1:1 backing of bridged assets through a Lock-Release mechanism on L1 and Burn-Mint mechanism on destination chains. The system is designed with security, capital efficiency, and scalability as core principles.
+
+### Architecture Diagram
+
+![lanca-canonical-bridge](../lancaCanonicalBridgeMainDiagram.png)
+
+### System Components
+
+#### LancaCanonicalBridgeL1
+
+The main contract deployed on **Ethereum (L1)** that orchestrates the entire bridging process. It serves as the central hub that manages relationships with destination chains, coordinates token deposits into chain-specific pools, and handles cross-chain message routing via Concero Router.
+
+When users initiate transfers, the L1 bridge accepts USDC deposits, routes tokens to the appropriate destination-specific pool, and sends cross-chain messages to destination chains. For return transfers, it receives burn notifications from destination chains and withdraws corresponding amounts from pools to complete the bridging cycle. The L1 bridge also handles **smart contract integration** through the callback mechanism, executing contract calls when recipients implement the client interface.
+
+#### LancaCanonicalBridgePool
+
+Individual pool contracts deployed on L1, each **dedicated to a specific destination chain**. These pools implement the Lock-Release mechanism by holding USDC collateral that backs bridged tokens on their respective destination chains.
+
+Each pool operates in isolation, providing **transparent proof of reserves** for its destination chain. This architecture offers clear fund allocation, simplified migration paths for Circle's native USDC expansion, and isolated risk management per chain. The pools handle deposit and withdrawal operations exclusively through the L1 bridge contract, ensuring controlled access to locked collateral.
+
+#### LancaCanonicalBridge
+
+Destination chain contracts that implement the **Burn-Mint mechanism** for USDC.e tokens. Each destination chain has its own bridge contract that communicates directly with the L1 bridge to maintain the canonical bridging flow.
+
+These contracts receive cross-chain messages from L1 and mint USDC.e tokens for incoming transfers. For outgoing transfers, they burn user tokens and send notifications back to L1. The destination bridges also handle **smart contract integration** through the callback mechanism, executing contract calls when recipients implement the client interface.
+
+### Cross-Chain Message Flow
+
+#### L1 → Destination Transfer
+
+1. **User Deposit**: User calls `sendToken()` on LancaCanonicalBridgeL1
+2. **Pool Deposit**: Bridge contract deposits USDC to destination-specific pool
+3. **Message Creation**: Bridge encodes transfer details and recipient information
+4. **Cross-Chain Relay**: Concero Router relays message to destination chain
+5. **Token Minting**: Destination bridge mints USDC.e to recipient
+6. **Contract Callback**: If recipient is a contract, execute `lancaCanonicalBridgeReceive()`
+
+#### Destination → L1 Transfer
+
+1. **Token Burning**: User calls `sendToken()` on destination LancaCanonicalBridge
+2. **USDC.e Burn**: Bridge burns user's USDC.e tokens
+3. **Message Creation**: Bridge encodes burn details and recipient information
+4. **Cross-Chain Relay**: Concero Router relays message to L1
+5. **Pool Withdrawal**: L1 bridge withdraws USDC from appropriate pool
+6. **Token Transfer**: L1 bridge transfers USDC to recipient
+7. **Contract Callback**: If recipient is a contract, execute `lancaCanonicalBridgeReceive()`
+
+### Security Architecture
+
+#### Rate Limiting System
+
+Each bridge contract implements configurable rate limiting to prevent excessive token flow and provide time for emergency response.
+
+**Rate Limiting Parameters:**
+
+* `maxAmount`: Maximum tokens that can be bridged in the time window
+* `refillSpeed`: Rate at which the limit refills over time
+* `isOutbound`: Separate limits for outbound vs inbound transfers
+
+**Rate Limiting Formula:**
+
+<Math
+  input="$$
+\text{Available Capacity} = \min(\text{maxAmount}, \text{lastCapacity} + \text{refillSpeed} \times \Delta t)
+$$"
+/>
+
+### Contract Integration Support
+
+#### Client Interface
+
+Smart contracts can receive bridged tokens through the `ILancaCanonicalBridgeClient` interface:
+
+```solidity
+interface ILancaCanonicalBridgeClient {
+    function lancaCanonicalBridgeReceive(
+        address token,
+        address sender,
+        uint256 amount,
+        bytes calldata data
+    ) external returns (bytes4);
+}
+```
+
+#### Magic Value Validation
+
+Contracts must return the correct magic value to confirm successful processing:
+
+```solidity
+require(
+    expectedSelector == ILancaCanonicalBridgeClient.lancaCanonicalBridgeReceive.selector,
+    ILancaCanonicalBridgeClient.CallFiled()
+);
+```
+
+***
+
+
+## Lanca Canonical Bridge
+
+**Lanca Canonical Bridge** is a canonical cross-chain infrastructure that enables secure transfer of USDC between Ethereum and other blockchain networks. Built on top of **Concero Messaging V2**, it implements a Lock-Release mechanism on L1 (Ethereum) and Burn-Mint mechanism on destination chains to ensure 1:1 backing of bridged assets.
+
+The bridge is designed with security as the primary focus, featuring isolated liquidity pools per destination chain, comprehensive rate limiting, and strict access controls.
+
+### Key Advantages
+
+* **True Canonical Bridging**: Full 1:1 backing through Lock-Release on L1 and Burn-Mint on destinations, with isolated pools providing transparent proof of reserves for each supported chain.
+* **Universal Smart Contract Support**: Seamless integration for both EOAs and contracts through unified interface and client callback mechanism.
+* **Multi-layered Security Model**: Rate limiting with automatic refill, emergency pausability and strict access controls protect against exploits and provide rapid incident response.
+* **Battle-tested Infrastructure**: Built on Concero V2 Messaging with cryptographic verification, and decentralized relaying for maximum cross-chain reliability.
+* **Future-ready Token Support**: USDC/USDC.e bridging with seamless migration path to native USDC as Circle expands cross-chain availability.
+
+***
+
+
 import Math from '../../components/Math';
 
 ## LBF Architecture Overview
 
-LBF implements a modular architecture that separates **liquidity management** from **operational settlement/messaging logic** across a *Parent Pool* (Master chain) and multiple *Child Pools* deployed to target networks. This reduces the need for mirrored capital on every chain and improves capital efficiency.
+Lanca Bridging Framework is a fully decentralised cross-chain bridging framework enabling seamless value transfer across different blockchain networks.
 
 The central *Parent Pool* is the primary entry/exit point for liquidity providers (LPs), while *Child Pools* provide instant local settlement and application-facing liquidity on their respective chains. Child pool states are periodically reported back to the Parent pool.
 
-Interchain communication is handled by **Concero V2 Messaging**, and periodic operational orchestration (liquidity snapshots, batch withdrawals) is driven by **LancaKeeper**.
+Interchain communication is handled by **Concero V2 Messaging**, and periodic operational orchestration (liquidity snapshots, batch withdrawals and deposits) is driven by **LancaKeeper**.
 
 LBF supports a **hybrid liquidity management model**: an automated planning layer (Parent-assigned targetBalance) is complemented by a market layer — **Rebalancers**, who earn fees by correcting deficits/surpluses through an IOU mechanism.
 
@@ -149,6 +268,147 @@ An LP sends assets to the Parent Pool → LP share tokens are minted proportiona
 \text{LP Share} = \frac{\text{User Deposit}}{\text{Total Pool Value}} \times 100\%
 $$"
 />
+
+**Share Token Mint Formula:**
+
+<Math
+  input="$$
+\text{Share Tokens} =
+\frac{\text{Deposit Amount} \times \text{Current Total Share Tokens}}
+{\text{Current Pool Value}}
+$$"
+/>
+
+#### 2. User Cross-Chain Transfer
+
+1. User calls `bridge()` on the source-chain LancaBridge.
+2. ConceroRouter relays the message to the destination chain.
+3. Destination LancaBridge verifies the payload and executes payout (EOA or client contract).
+
+#### 3. Real-Time Rebalancer Role
+
+A Rebalancer detects a Child pool deficit → deposits assets → receives IOU for the deposit amount → transfers IOU to a surplus chain (Concero V2 Messaging burn/mint) → redeems IOU for underlying assets + fee.
+
+#### 4. LP Withdrawal Logic
+
+1. LP burns LP tokens in the Parent Pool to request withdrawal.
+2. The Parent Pool *temporarily raises* its `targetBalance` by the withdrawal amount, intentionally moving itself into a deficit state — an economic signal to Rebalancers.
+3. Rebalancers top up the Parent Pool toward the new target.
+4. Once actual balance meets target, LancaKeeper finalizes the withdrawal and transfers assets to the LP. Withdrawal time depends on system rebalancing speed, not a hard fixed delay.
+
+### Hybrid Liquidity Management
+
+The LBF architecture blends **centralized liquidity target planning** (Parent Pool) with **market-driven reactiveness** (Rebalancers), minimizing idle capital while preserving fast local settlement.
+
+#### Pool Status Variables
+
+For each pool the following are tracked:
+
+* `balance`
+* `rebalancingFees`
+* `activeLiquidity = balance - rebalancingFees`
+* `targetBalance` (dynamic goal set by the Parent Pool)
+
+Comparing `activeLiquidity` to `targetBalance` yields one of three states: **Surplus**, **Balanced**, **Deficit**. These states govern which Rebalancer actions are allowed.
+
+<Math
+  input="$$
+\text{activeLiquidity} = \text{balance} - \text{rebalancingFees}
+$$"
+/>
+
+#### Monitoring Cycle
+
+The Parent Pool + LancaKeeper collect regular Child pool snapshots and adjust `targetBalance` in response to network activity. When a Child Pool drifts from its target, Rebalancers receive an economic signal to act.
+
+#### Fast Rebalancer Adjustments
+
+Rebalancers provide a “fast lane” between major Parent pool redistribution cycles: they deposit into deficit pools and withdraw from surplus pools using IOUs. This two-layer approach shortens system response time to load spikes.
+
+#### IOU Redemption Constraint
+
+IOU redemption is allowed only if the target pool’s balance exceeds its `targetBalance`, protecting operational liquidity and preventing depletion. Without surplus, the Rebalancer must wait or choose another pool.
+
+## Dynamic Liquidity Rebalancing Algorithm
+
+To optimize capital allocation, the Parent Pool periodically recalculates each Child pool’s `targetBalance` using a **Liquidity Health Score (LHS)** that aggregates usage and stress metrics. The objective: move capital from “overfunded” pools to “high-demand” pools while keeping total system liquidity constant.
+
+### Metrics
+
+#### Liquidity Utilisation Ratio (LUR)
+
+<Math
+  input="$$
+\text{LUR} = \frac{\text{Inflow} + \text{Outflow}}{\text{targetBalance}}
+$$"
+/>
+
+Measures transaction intensity relative to the pool’s target. Higher volume vs target → higher utilization pressure.
+
+**Normalization:**
+
+<Math
+  input="$$
+\text{LURScore} = 1 - \frac{\text{LUR}}{K + \text{LUR}}
+$$"
+/>
+
+Sensitivity parameter (K) controls how quickly the score falls as activity rises.
+
+#### Net Drain Rate (NDR)
+
+<Math
+  input="$$
+\text{NDR} = \frac{\text{Outflow} - \text{Inflow}}{\text{targetBalance}}
+$$"
+/>
+
+Positive → net outflow (stress). Zero/negative → stable or net inflow.
+
+**Score:**
+
+<Math
+  input="$$
+\text{NDRScore} =
+\begin{cases}
+1, & \text{if } \text{NDR} \le 0 \\
+\max(0, 1 - \text{NDR}), & \text{if } \text{NDR} > 0
+\end{cases}
+$$"
+/>
+
+#### Liquidity Health Score (LHS)
+
+Weighted aggregate of LUR and NDR:
+
+<Math
+  input="$$
+\text{LHS} = W_1 \times \text{LURScore} + W_2 \times \text{NDRScore}
+$$"
+/>
+
+#### Recomputing targetBalance
+
+1. **Weighting Function:**
+   Lower LHS → higher priority for capital allocation. Alpha is a sensitivity constant.
+
+2. **Intermediate Pool Weight (W\_i):**
+
+<Math input="$$W_i = \text{Original targetBalance}_i \times f(\text{LHS}_i)$$" />
+
+3. **Normalized Redistribution:**
+
+<Math input="$$\text{New targetBalance}_i = \frac{W_i}{\sum_{j=1}^{N} W_j} \times \text{Total Liquidity}$$" />
+
+System-wide liquidity remains constant.
+
+### LBF Security
+
+The Parent-Child Pool architecture introduces a critical liquidity concentration at the Parent Pool, compromise at this level could cascade across all Child pools, so strict privilege controls and validation are required.
+
+Reliance on cross-chain communication (Concero V2 Messaging) means message integrity and authenticity are essential to settlement correctness and liquidity flows. Message validation failures could misdirect assets between chains.
+
+The IOU burn/mint mechanism is vulnerable to replay attacks unless strict cross-chain message *nonce* handling is enforced; reprocessing a valid message could double-mint IOUs and enable economic exploitation.
 
 
 ## Glossary
