@@ -1,0 +1,78 @@
+# Interface
+
+## bridge
+
+```solidity
+function bridge(
+			address tokenReceiver,
+			uint256 tokenAmount,
+			uint24 dstChainSelector,
+			uint256 dstGasLimit,
+			bytes calldata dstCallData
+) external returns (bytes32 messageId)
+```
+
+Performs a cross-chain transfer of your liquidity ERC-20 token via Concero, optionally invoking a receiver hook on the destination chain.
+`_lancaReceive` is not invoked when `dstGasLimit == 0` and `dstCallData == 0x`. In that case, the contract simply transfers the tokens to `tokenReceiver` without calling `lancaReceive`.
+
+
+| Parameter          | Type (EVM) | Description                                                                             |
+|--------------------|------------|-----------------------------------------------------------------------------------------|
+| `tokenReceiver`    | `address`  | Address on the destination chain to receive tokens (and, if present, execute the hook). |
+| `tokenAmount`      | `uint256`  | Amount of the liquidity token to bridge.                                                |
+| `dstChainSelector` | `uint24`   | Concero chain selector for the destination chain.                                       |
+| `dstGasLimit`      | `uint256`  | Gas limit for your hook on the destination chain.                                       |
+| `dstCallData`      | `bytes`    | ABI-encoded arguments for your hook.                                                    |
+
+
+:::warning
+msg.value must equal the native fee returned by getBridgeNativeFee(dstChainSelector, dstGasLimit).
+:::
+
+## _lancaReceive
+
+```solidity
+function _lancaReceive(
+	bytes32 id,
+	uint24 srcChainSelector,
+	address sender,
+	uint256 amount,
+	bytes memory data
+) external;
+```
+
+| Parameter             | Type (EVM) | Description                                                                                         |
+|-----------------------|------------|-----------------------------------------------------------------------------------------------------|
+| `messageId`           | `bytes32`  | Unique identifier of the bridge message; use it for tracking and idempotency on the destination.    |
+| `sourceChainSelector` | `uint24`   | Concero selector of the **source** chain the transfer originated from.                              |
+| `tokenSender`         | `address`  | Sender address on the source chain that initiated the bridge.                                       |
+| `tokenAmount`         | `uint256`  | Amount of the liquidity token delivered **after fees** on the destination chain (token decimals).   |
+| `dstCallData`         | `bytes`    | ABI-encoded payload passed through from the sender; parse/validate according to your hook’s schema. |
+
+
+To handle bridged tokens with a hook, your destination contract must implement ILancaClient and support ERC-165 for type(ILancaClient).interfaceId.
+
+When the message arrives:
+* The bridge transfers tokens to tokenReceiver.
+* If a hook is configured, it then calls `ILancaClient(tokenReceiver).lancaReceive{gas: dstGasLimit}`
+
+If lancaReceive reverts or runs out of gas, the entire delivery reverts atomically (no tokens are transferred).
+
+:::warning
+inside lancaReceive, verify sender is your trusted destination pool/bridge on that chain.
+:::
+
+## getBridgeNativeFee
+
+```solidity
+function getBridgeNativeFee(
+	uint24 dstChainSelector,
+	uint256 dstGasLimit
+) external view returns (uint256)
+```
+Returns the native currency fee you must pass in msg.value when calling `bridge`.
+
+| Name             | Type    | Description                                    |
+|------------------|---------|------------------------------------------------|
+| dstChainSelector | uint24  | Selector of the destination chain.             |
+| dstGasLimit      | uint256 | Gas limit for the destination hook (0 if none) |

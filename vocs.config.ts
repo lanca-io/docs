@@ -78,6 +78,10 @@ export default defineConfig({
 					text: 'Glossary',
 					link: '/lbf/glossary',
 				},
+				{
+					text: 'Interface',
+					link: '/lbf/interface',
+				},
 			],
 		},
 		{
