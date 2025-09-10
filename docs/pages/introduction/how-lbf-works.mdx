@@ -1,0 +1,38 @@
+---
+title: How LBF Works?
+description: Explain how Lanca Bridging Framework (LBF) works in non-technicaldetail.
+---
+
+# How LBF Works
+
+The LBF is a decentralised bridge powered by [Concero V2 Messaging](https://www.concero.io/). It is designed to solve the "bridging trilemma" by efficiently managing liquidity across many blockchains. Its innovative architecture minimises idle capital, making cross-chain transfers fast, secure, and cost-effective.
+
+At its core, LBF uses a **Parent-Child Pool** model.
+
+- **Parent Pool**: This is the central liquidity hub located on a master blockchain. It holds the system's total liquidity, like a central bank.
+- **Child Pools**: These are smaller liquidity pools on all other connected chains. They act like local branches, holding sufficient funds to process user transactions instantly.
+
+![Parent-child Pool Architecture](../introduction/parent-child-pool-architecture.png)
+
+---
+This structure is kept in balance by two key mechanisms:
+
+### 1. Rebalancers and the IOU System
+
+To handle daily fluctuations, LBF relies on independent 3rd-parties called **Rebalancers**.
+
+![Rebalancer Architecture](../introduction/rebalancers.png)
+
+When a Child Pool runs low on funds (a "deficit" state) due to high demand, a Rebalancer can step in and deposit their own capital to top it up. In return, the system issues them an **IOU (I-owe-you)** token, which is a receipt for their deposit.
+
+The Rebalancer can then take this IOU to any Child Pool with excess funds (a "surplus" state) and redeem it to get their capital back, plus a fee for their service. This process acts as a rapid, market-driven way to shift liquidity exactly where it is needed, ensuring transactions never fail due to a lack of funds.
+
+![Rebalancer Process](../introduction/rebalancer-process.png)
+
+### 2. Dynamic Rebalancing Algorithm
+
+For long-term efficiency, the Parent Pool uses a **Dynamic Rebalancing Algorithm**. It constantly analyses the transaction volume and health of every Child Pool.
+
+Based on this data, the algorithm intelligently adjusts the target amount of liquidity each Child Pool should hold. It automatically moves capital from less active pools to busier ones, preventing funds from being wasted and maximising the system's overall capital efficiency.
+
+By combining the strategic oversight of the Parent Pool with the quick actions of Rebalancers, LBF creates a highly adaptive and secure network for seamless cross-chain value transfer.

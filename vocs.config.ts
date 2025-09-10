@@ -17,6 +17,28 @@ export default defineConfig({
 	iconUrl: '/logo/lanca/favicon.ico',
 	sidebar: [
 		{
+			text: 'Introduction to Lanca Bridging Framework',
+			collapsed: true,
+			items: [
+				{
+					text: 'What is Lanca Bridging Framework?',
+					link: '/introduction/what-is-lbf',
+				},
+				{
+					text: 'How LBF Works?',
+					link: '/introduction/how-lbf-works',
+				},
+				{
+					text: 'Key Benefits to Users',
+					link: '/introduction/key-benefits-users',
+				},
+				{
+					text: 'Key Benefits to Developers & Blockchain Ecosystems',
+					link: '/introduction/key-benefits-dev-ecosystem',
+				},
+			],
+		},
+		{
 			text: 'V1',
 			collapsed: false,
 			items: [
