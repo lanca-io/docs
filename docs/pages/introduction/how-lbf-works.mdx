@@ -3,9 +3,9 @@ title: How LBF Works?
 description: Explain how Lanca Bridging Framework (LBF) works in non-technicaldetail.
 ---
 
-# How LBF Works
+# How LBF Works? 
 
-The LBF is a decentralised bridge powered by [Concero V2 Messaging](https://www.concero.io/). It is designed to solve the "bridging trilemma" by efficiently managing liquidity across many blockchains. Its innovative architecture minimises idle capital, making cross-chain transfers fast, secure, and cost-effective.
+The LBF is a decentralised bridge powered by [Concero V2 Messaging](https://www.concero.io/) that delivers fast, secure, and cost-effective cross-chain transfers without compromise. Its innovative architecture achieves this by efficiently managing liquidity and ensuring capital is always actively working across multiple blockchains.
 
 At its core, LBF uses a **Parent-Child Pool** model.
 
@@ -19,13 +19,13 @@ This structure is kept in balance by two key mechanisms:
 
 ### 1. Rebalancers and the IOU System
 
-To handle daily fluctuations, LBF relies on independent 3rd-parties called **Rebalancers**.
+To handle daily fluctuations, LBF relies on independent third-parties called **Rebalancers**.
 
 ![Rebalancer Architecture](../introduction/rebalancers.png)
 
-When a Child Pool runs low on funds (a "deficit" state) due to high demand, a Rebalancer can step in and deposit their own capital to top it up. In return, the system issues them an **IOU (I-owe-you)** token, which is a receipt for their deposit.
+When a Child Pool runs low on funds (a *deficit* state) due to high demand, a Rebalancer can step in and deposit their own capital to top it up. In return, the system issues them an **IOU (I-owe-you)** token, which is a receipt for their deposit.
 
-The Rebalancer can then take this IOU to any Child Pool with excess funds (a "surplus" state) and redeem it to get their capital back, plus a fee for their service. This process acts as a rapid, market-driven way to shift liquidity exactly where it is needed, ensuring transactions never fail due to a lack of funds.
+The Rebalancer can then take this IOU to any Child Pool with excess funds (a *surplus* state) and redeem it to get their capital back, plus a fee for their service. This process acts as a rapid, market-driven way to shift liquidity exactly where it is needed, ensuring transactions never fail due to a lack of funds.
 
 ![Rebalancer Process](../introduction/rebalancer-process.png)
 
