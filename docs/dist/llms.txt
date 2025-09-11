@@ -1,0 +1,23 @@
+# Lanca Docs
+
+> Lanca Bridge Documentation
+
+## Docs
+
+- [Get started](/getting-started): Welcome to the Lanca SDK documentation! This page will guide you through the process of getting started with the Lanca SDK.
+- [Lanca Canonical Bridge Architecture](/lanca-canonical-bridge/architecture): Lanca Canonical Bridge implements a canonical bridging architecture that ensures 1:1 backing of bridged assets through a Lock-Release mechanism on L1 and Burn-Mint mechanism on destination chains. The system is designed with security, capital efficiency, and scalability as core principles.
+- [Lanca Canonical Bridge](/lanca-canonical-bridge/overview): **Lanca Canonical Bridge** is a canonical cross-chain infrastructure that enables secure transfer of USDC between Ethereum and other blockchain networks. Built on top of **Concero Messaging V2**, it implements a Lock-Release mechanism on L1 (Ethereum) and Burn-Mint mechanism on destination chains to ensure 1:1 backing of bridged assets.
+- [LBF Architecture Overview](/lbf/architecture): Lanca Bridging Framework is a fully decentralised cross-chain bridging framework enabling seamless value transfer across different blockchain networks.
+- [Dynamic Liquidity Rebalancing Algorithm](/lbf/architecture): Triggers periodic Child pool liquidity snapshots;
+- [Router Deployments](/lbf/deployments): This page lists all CONCERO\_ROUTER\_PROXY addresses from our deployment configuration.
+Use the toggle switch to view addresses for testnet or mainnet environments.
+- [Glossary](/lbf/glossary): **LBF (Lanca Bridging Framework)** — decentralized cross-chain liquidity framework enabling value movement between networks with high capital efficiency and security.
+- [Interface](/lbf/interface): Performs a cross-chain transfer of your liquidity ERC-20 token via Concero, optionally invoking a receiver hook on the destination chain.
+`_lancaReceive` is not invoked when `dstGasLimit == 0` and `dstCallData == 0x`. In that case, the contract simply transfers the tokens to `tokenReceiver` without calling `lancaReceive`.
+- [Lanca Bridging Framework (LBF)](/lbf/overview): **Lanca Bridging Framework (LBF)** is a fully decentralized cross-chain framework that enables seamless value transfer across blockchain networks by combining a *Parent-Child Pool* model, a dynamic IOU system, and hybrid liquidity management. The goal: eliminate liquidity fragmentation, improve capital efficiency, and scale interchain operations without compromising on security or decentralization.
+- [Lanca Bridge Architecture](/v1/lanca-bridge/architecture): The architecture of Lanca Bridge is divided into two main components:
+- [Contract Deployments](/v1/lanca-bridge/deployments): Arbitrum: [0x4459d95b396c418B2144943910E2e68548fFE589](https://arbiscan.io/address/0x4459d95b396c418B2144943910E2e68548fFE589)
+- [Interface](/v1/lanca-bridge/interface): Performs a cross-chain transfer of tokens from the source chain to the destination chain.
+- [Overview](/v1/lanca-bridge/overview): Lanca Bridge is a cross-chain infrastructure that enables the transfer of value from one chain to another. Under the hood, it uses Concero Messaging as the execution layer and CCIP as the settlement layer.
+- [LancaSDK](/v1/sdk/methods): The `LancaClient` class provides a set of methods for interacting with the Lanca API.
+- [Data Types](/v1/sdk/types): A type representing a configuration for RPC.

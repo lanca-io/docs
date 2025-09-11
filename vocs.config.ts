@@ -82,6 +82,10 @@ export default defineConfig({
 					text: 'Interface',
 					link: '/lbf/interface',
 				},
+				{
+					text: 'Deployments',
+					link: '/lbf/deployments',
+				},
 			],
 		},
 		{

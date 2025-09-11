@@ -1,0 +1,1098 @@
+# Lanca Docs
+
+> Lanca Bridge Documentation
+
+## Get started
+
+Welcome to the Lanca SDK documentation! This page will guide you through the process of getting started with the Lanca SDK.
+
+::::steps
+#### Installation
+
+To install the Lanca SDK, run the following command in your terminal:
+
+:::code-group
+```bash [npm]
+npm i @lanca/sdk
+```
+
+```bash [yarn]
+yarn add @lanca/sdk
+```
+
+```bash [pnpm]
+pnpm add @lanca/sdk
+```
+
+```bash [bun]
+bun i @lanca/sdk
+```
+:::
+
+#### Creating a Configuration
+
+To use the Lanca SDK, you need to create a configuration object. Here is an example of a basic configuration:
+
+```ts
+// [!include ~/snippets/code/getting-started/using.ts:config]
+```
+
+Replace `YOUR_INTEGRATOR_ADDRESS` with the actual address of the integrator. Collected fees are accumulated in the Lanca Orchestrator contract and can only be withdrawn by the integrator.
+
+Set `feeBps` as the desired fee rate in basis points (bps). This fee is applied in addition to the Lanca fee.
+
+#### Creating a LancaClient
+
+To use the Lanca SDK, you need to create a LancaClient object. Here is an example of a basic usage:
+
+```ts
+// [!include ~/snippets/code/getting-started/using.ts:sdk]
+```
+
+#### Request a route
+
+To request a route for token exchange, please provide the addresses of the two tokens, their network IDs, the amount of the first token, and the slippage percentage.
+For example, you can request a route by specifying the token addresses, network IDs, amount, and slippage, and our SDK will provide you with the optimal route for the exchange.
+
+```ts
+// [!include ~/snippets/code/getting-started/using.ts:requestRoute]
+```
+
+#### Execute a route
+
+To execute a route for token exchange, please provide the obtained route data and our SDK will handle the exchange process for you. Simply pass the route data to the LancaSDK object and it will execute the exchange according to the provided parameters.
+
+```ts
+// [!include ~/snippets/code/getting-started/using.ts:executeRoute]
+```
+
+#### Track route status
+
+To track the status of a route for token exchange, you can use the `getRouteStatus` method of the LancaClient object. This method allows you to retrieve the current status of the route, including any updates or changes that have occurred during the exchange process.
+
+```ts
+// [!include ~/snippets/code/getting-started/using.ts:trackRouteStatus]
+```
+
+This is just a basic example to get you started. For more information on the Lanca SDK and its features, please refer to the rest of the documentation.
+
+### Next Steps
+
+* Learn more about the Lanca SDK and its features
+* Explore the API reference for more information on the available methods and properties
+* Check out the examples section for more code snippets and tutorials
+::::
+
+
+import Math from '../../components/Math'
+
+## Lanca Canonical Bridge Architecture
+
+Lanca Canonical Bridge implements a canonical bridging architecture that ensures 1:1 backing of bridged assets through a Lock-Release mechanism on L1 and Burn-Mint mechanism on destination chains. The system is designed with security, capital efficiency, and scalability as core principles.
+
+### Architecture Diagram
+
+![lanca-canonical-bridge](../lancaCanonicalBridgeMainDiagram.png)
+
+### System Components
+
+#### LancaCanonicalBridgeL1
+
+The main contract deployed on **Ethereum (L1)** that orchestrates the entire bridging process. It serves as the central hub that manages relationships with destination chains, coordinates token deposits into chain-specific pools, and handles cross-chain message routing via Concero Router.
+
+When users initiate transfers, the L1 bridge accepts USDC deposits, routes tokens to the appropriate destination-specific pool, and sends cross-chain messages to destination chains. For return transfers, it receives burn notifications from destination chains and withdraws corresponding amounts from pools to complete the bridging cycle. The L1 bridge also handles **smart contract integration** through the callback mechanism, executing contract calls when recipients implement the client interface.
+
+#### LancaCanonicalBridgePool
+
+Individual pool contracts deployed on L1, each **dedicated to a specific destination chain**. These pools implement the Lock-Release mechanism by holding USDC collateral that backs bridged tokens on their respective destination chains.
+
+Each pool operates in isolation, providing **transparent proof of reserves** for its destination chain. This architecture offers clear fund allocation, simplified migration paths for Circle's native USDC expansion, and isolated risk management per chain. The pools handle deposit and withdrawal operations exclusively through the L1 bridge contract, ensuring controlled access to locked collateral.
+
+#### LancaCanonicalBridge
+
+Destination chain contracts that implement the **Burn-Mint mechanism** for USDC.e tokens. Each destination chain has its own bridge contract that communicates directly with the L1 bridge to maintain the canonical bridging flow.
+
+These contracts receive cross-chain messages from L1 and mint USDC.e tokens for incoming transfers. For outgoing transfers, they burn user tokens and send notifications back to L1. The destination bridges also handle **smart contract integration** through the callback mechanism, executing contract calls when recipients implement the client interface.
+
+### Cross-Chain Message Flow
+
+#### L1 → Destination Transfer
+
+1. **User Deposit**: User calls `sendToken()` on LancaCanonicalBridgeL1
+2. **Pool Deposit**: Bridge contract deposits USDC to destination-specific pool
+3. **Message Creation**: Bridge encodes transfer details and recipient information
+4. **Cross-Chain Relay**: Concero Router relays message to destination chain
+5. **Token Minting**: Destination bridge mints USDC.e to recipient
+6. **Contract Callback**: If recipient is a contract, execute `lancaCanonicalBridgeReceive()`
+
+#### Destination → L1 Transfer
+
+1. **Token Burning**: User calls `sendToken()` on destination LancaCanonicalBridge
+2. **USDC.e Burn**: Bridge burns user's USDC.e tokens
+3. **Message Creation**: Bridge encodes burn details and recipient information
+4. **Cross-Chain Relay**: Concero Router relays message to L1
+5. **Pool Withdrawal**: L1 bridge withdraws USDC from appropriate pool
+6. **Token Transfer**: L1 bridge transfers USDC to recipient
+7. **Contract Callback**: If recipient is a contract, execute `lancaCanonicalBridgeReceive()`
+
+### Security Architecture
+
+#### Rate Limiting System
+
+Each bridge contract implements configurable rate limiting to prevent excessive token flow and provide time for emergency response.
+
+**Rate Limiting Parameters:**
+
+* `maxAmount`: Maximum tokens that can be bridged in the time window
+* `refillSpeed`: Rate at which the limit refills over time
+* `isOutbound`: Separate limits for outbound vs inbound transfers
+
+**Rate Limiting Formula:**
+
+<Math
+  input="$$
+\text{Available Capacity} = \min(\text{maxAmount}, \text{lastCapacity} + \text{refillSpeed} \times \Delta t)
+$$"
+/>
+
+### Contract Integration Support
+
+#### Client Interface
+
+Smart contracts can receive bridged tokens through the `ILancaCanonicalBridgeClient` interface:
+
+```solidity
+interface ILancaCanonicalBridgeClient {
+    function lancaCanonicalBridgeReceive(
+        address token,
+        address sender,
+        uint256 amount,
+        bytes calldata data
+    ) external returns (bytes4);
+}
+```
+
+#### Magic Value Validation
+
+Contracts must return the correct magic value to confirm successful processing:
+
+```solidity
+require(
+    expectedSelector == ILancaCanonicalBridgeClient.lancaCanonicalBridgeReceive.selector,
+    ILancaCanonicalBridgeClient.CallFiled()
+);
+```
+
+***
+
+
+## Lanca Canonical Bridge
+
+**Lanca Canonical Bridge** is a canonical cross-chain infrastructure that enables secure transfer of USDC between Ethereum and other blockchain networks. Built on top of **Concero Messaging V2**, it implements a Lock-Release mechanism on L1 (Ethereum) and Burn-Mint mechanism on destination chains to ensure 1:1 backing of bridged assets.
+
+The bridge is designed with security as the primary focus, featuring isolated liquidity pools per destination chain, comprehensive rate limiting, and strict access controls.
+
+### Key Advantages
+
+* **True Canonical Bridging**: Full 1:1 backing through Lock-Release on L1 and Burn-Mint on destinations, with isolated pools providing transparent proof of reserves for each supported chain.
+* **Universal Smart Contract Support**: Seamless integration for both EOAs and contracts through unified interface and client callback mechanism.
+* **Multi-layered Security Model**: Rate limiting with automatic refill, emergency pausability and strict access controls protect against exploits and provide rapid incident response.
+* **Battle-tested Infrastructure**: Built on Concero V2 Messaging with cryptographic verification, and decentralized relaying for maximum cross-chain reliability.
+* **Future-ready Token Support**: USDC/USDC.e bridging with seamless migration path to native USDC as Circle expands cross-chain availability.
+
+***
+
+
+import Math from '../../components/Math';
+
+## LBF Architecture Overview
+
+Lanca Bridging Framework is a fully decentralised cross-chain bridging framework enabling seamless value transfer across different blockchain networks.
+
+The central *Parent Pool* is the primary entry/exit point for liquidity providers (LPs), while *Child Pools* provide instant local settlement and application-facing liquidity on their respective chains. Child pool states are periodically reported back to the Parent pool.
+
+Interchain communication is handled by **Concero V2 Messaging**, and periodic operational orchestration (liquidity snapshots, batch withdrawals and deposits) is driven by **LancaKeeper**.
+
+LBF supports a **hybrid liquidity management model**: an automated planning layer (Parent-assigned targetBalance) is complemented by a market layer — **Rebalancers**, who earn fees by correcting deficits/surpluses through an IOU mechanism.
+
+### Architecture Diagram
+
+![lbf](../lbfMainDiagram.png)
+
+**Core Components:** Parent Pool, Child Pool, LancaBridge (transfer initiator/executor contracts), ConceroRouter (cross-chain message router), ConceroPriceFeed (price oracle), LancaKeeper (automated operator), Rebalancers (market participants performing liquidity balancing).
+
+### System Components
+
+#### Parent Pool (Master Chain)
+
+Primary liquidity hub: accepts LP deposits, mints LP share tokens proportionate to pool ownership, processes batch withdrawals, and computes dynamic `targetBalance` values for all Child Pools.
+
+The Parent Pool updates liquidity targets based on network activity and Child pool state reports (metrics + balances). Target distribution instructions are dispatched via Concero V2 Messaging.
+
+#### Child Pool
+
+Local liquidity pool on a destination chain: holds funds for immediate settlement of transfers, periodically reports state back to the Parent Pool, and participates in Rebalancer deposit/withdraw (IOU) operations.
+
+#### LancaBridge
+
+Contracts on source and destination chains that users call to initiate cross-chain transfers. They assemble the cross-chain payload, and relay it through the ConceroRouter. On the destination chain, the payload is validated and executed—either disbursing funds to the user or invoking the specified downstream contract.
+
+#### ConceroRouter (Concero V2 Messaging)
+
+Secure delivery of cross-chain messages/instructions ensuring Parent↔Child consistency, IOU burn/mint, and interchain contract calls. Cryptographic and economic security properties come from Concero Messaging.
+
+#### LancaKeeper
+
+Automated (off-chain + privileged on-chain) operator that:
+
+1. Triggers periodic Child pool liquidity snapshots;
+2. Initiates batch deposits/withdrawals at the Parent Pool;
+3. Finalizes withdrawals once consolidated liquidity is available.
+
+#### Rebalancers
+
+Independent actors who monitor pool status (`activeLiquidity` vs `targetBalance`) and quickly fill deficits (deposit) or remove surplus (withdraw) in exchange for **IOU** claims that can later be redeemed from surplus pools (with fee).
+
+IOU redemption is permitted only from pools operating above their `targetBalance` — protecting operational liquidity. If a chosen pool is not in surplus, the Rebalancer must wait or select another pool for redemption.
+
+### Operational Flows in LBF
+
+#### 1. LP Liquidity Deposit → Parent Pool
+
+An LP sends assets to the Parent Pool → LP share tokens are minted proportionally (see formulas below) → aggregate pool value is updated → `targetBalance` values for Child Pools may be adjusted.
+
+**LP Share:**
+
+<Math
+  input="$$
+\text{LP Share} = \frac{\text{User Deposit}}{\text{Total Pool Value}} \times 100\%
+$$"
+/>
+
+**Share Token Mint Formula:**
+
+<Math
+  input="$$
+\text{Share Tokens} =
+\frac{\text{Deposit Amount} \times \text{Current Total Share Tokens}}
+{\text{Current Pool Value}}
+$$"
+/>
+
+#### 2. User Cross-Chain Transfer
+
+1. User calls `bridge()` on the source-chain LancaBridge.
+2. ConceroRouter relays the message to the destination chain.
+3. Destination LancaBridge verifies the payload and executes payout (EOA or client contract).
+
+#### 3. Real-Time Rebalancer Role
+
+A Rebalancer detects a Child pool deficit → deposits assets → receives IOU for the deposit amount → transfers IOU to a surplus chain (Concero V2 Messaging burn/mint) → redeems IOU for underlying assets + fee.
+
+#### 4. LP Withdrawal Logic
+
+1. LP burns LP tokens in the Parent Pool to request withdrawal.
+2. The Parent Pool *temporarily raises* its `targetBalance` by the withdrawal amount, intentionally moving itself into a deficit state — an economic signal to Rebalancers.
+3. Rebalancers top up the Parent Pool toward the new target.
+4. Once actual balance meets target, LancaKeeper finalizes the withdrawal and transfers assets to the LP. Withdrawal time depends on system rebalancing speed, not a hard fixed delay.
+
+### Hybrid Liquidity Management
+
+The LBF architecture blends **centralized liquidity target planning** (Parent Pool) with **market-driven reactiveness** (Rebalancers), minimizing idle capital while preserving fast local settlement.
+
+#### Pool Status Variables
+
+For each pool the following are tracked:
+
+* `balance`
+* `rebalancingFees`
+* `activeLiquidity = balance - rebalancingFees`
+* `targetBalance` (dynamic goal set by the Parent Pool)
+
+Comparing `activeLiquidity` to `targetBalance` yields one of three states: **Surplus**, **Balanced**, **Deficit**. These states govern which Rebalancer actions are allowed.
+
+<Math
+  input="$$
+\text{activeLiquidity} = \text{balance} - \text{rebalancingFees}
+$$"
+/>
+
+#### Monitoring Cycle
+
+The Parent Pool + LancaKeeper collect regular Child pool snapshots and adjust `targetBalance` in response to network activity. When a Child Pool drifts from its target, Rebalancers receive an economic signal to act.
+
+#### Fast Rebalancer Adjustments
+
+Rebalancers provide a “fast lane” between major Parent pool redistribution cycles: they deposit into deficit pools and withdraw from surplus pools using IOUs. This two-layer approach shortens system response time to load spikes.
+
+#### IOU Redemption Constraint
+
+IOU redemption is allowed only if the target pool’s balance exceeds its `targetBalance`, protecting operational liquidity and preventing depletion. Without surplus, the Rebalancer must wait or choose another pool.
+
+## Dynamic Liquidity Rebalancing Algorithm
+
+To optimize capital allocation, the Parent Pool periodically recalculates each Child pool’s `targetBalance` using a **Liquidity Health Score (LHS)** that aggregates usage and stress metrics. The objective: move capital from “overfunded” pools to “high-demand” pools while keeping total system liquidity constant.
+
+### Metrics
+
+#### Liquidity Utilisation Ratio (LUR)
+
+<Math
+  input="$$
+\text{LUR} = \frac{\text{Inflow} + \text{Outflow}}{\text{targetBalance}}
+$$"
+/>
+
+Measures transaction intensity relative to the pool’s target. Higher volume vs target → higher utilization pressure.
+
+**Normalization:**
+
+<Math
+  input="$$
+\text{LURScore} = 1 - \frac{\text{LUR}}{K + \text{LUR}}
+$$"
+/>
+
+Sensitivity parameter (K) controls how quickly the score falls as activity rises.
+
+#### Net Drain Rate (NDR)
+
+<Math
+  input="$$
+\text{NDR} = \frac{\text{Outflow} - \text{Inflow}}{\text{targetBalance}}
+$$"
+/>
+
+Positive → net outflow (stress). Zero/negative → stable or net inflow.
+
+**Score:**
+
+<Math
+  input="$$
+\text{NDRScore} =
+\begin{cases}
+1, & \text{if } \text{NDR} \le 0 \\
+\max(0, 1 - \text{NDR}), & \text{if } \text{NDR} > 0
+\end{cases}
+$$"
+/>
+
+#### Liquidity Health Score (LHS)
+
+Weighted aggregate of LUR and NDR:
+
+<Math
+  input="$$
+\text{LHS} = W_1 \times \text{LURScore} + W_2 \times \text{NDRScore}
+$$"
+/>
+
+#### Recomputing targetBalance
+
+1. **Weighting Function:**
+   Lower LHS → higher priority for capital allocation. Alpha is a sensitivity constant.
+
+2. **Intermediate Pool Weight (W\_i):**
+
+<Math input="$$W_i = \text{Original targetBalance}_i \times f(\text{LHS}_i)$$" />
+
+3. **Normalized Redistribution:**
+
+<Math input="$$\text{New targetBalance}_i = \frac{W_i}{\sum_{j=1}^{N} W_j} \times \text{Total Liquidity}$$" />
+
+System-wide liquidity remains constant.
+
+### LBF Security
+
+The Parent-Child Pool architecture introduces a critical liquidity concentration at the Parent Pool, compromise at this level could cascade across all Child pools, so strict privilege controls and validation are required.
+
+Reliance on cross-chain communication (Concero V2 Messaging) means message integrity and authenticity are essential to settlement correctness and liquidity flows. Message validation failures could misdirect assets between chains.
+
+The IOU burn/mint mechanism is vulnerable to replay attacks unless strict cross-chain message *nonce* handling is enforced; reprocessing a valid message could double-mint IOUs and enable economic exploitation.
+
+
+## Router Deployments
+
+This page lists all CONCERO\_ROUTER\_PROXY addresses from our deployment configuration.
+Use the toggle switch to view addresses for testnet or mainnet environments.
+
+import RouterDeploymentsWithSwitch from '../../components/RouterDeploymentsWithSwitch.tsx';
+
+<RouterDeploymentsWithSwitch />
+
+### Using Router Proxies
+
+To use these router proxies in your contracts, you'll need to:
+
+1. Import the required interfaces
+2. Initialize the router with the appropriate address for your network
+3. Call the router's messaging functions
+
+
+## Glossary
+
+**LBF (Lanca Bridging Framework)** — decentralized cross-chain liquidity framework enabling value movement between networks with high capital efficiency and security.
+
+**Parent Pool** — central liquidity pool (Master chain) that accepts LP deposits, performs batch withdrawals, and manages Child pool target balances.
+
+**Child Pool** — local pool on a destination network providing instant settlement liquidity and participating in IOU-based rebalancing.
+
+**LancaBridge** — smart contracts through which users initiate and complete cross-chain transfers.
+
+**ConceroRouter / Concero V2 Messaging** — secure cross-chain message & instruction transport used by LBF.
+
+**ConceroPriceFeed** — price oracle for fair cross-asset settlement calculations.
+
+**LancaKeeper** — automated operator handling periodic tasks: liquidity snapshots, batch deposits, batch withdrawals, and withdrawal finalization.
+
+**Rebalancer** — independent participant who supplies capital to deficit pools and extracts from surplus pools via an IOU system in exchange for rewards.
+
+**IOU (I-Owe-You Token)** — tokenized claim issued when a Rebalancer deposits into a deficit pool; redeemable from a surplus pool (subject to Surplus status) for underlying assets + fee.
+
+**targetBalance** — liquidity goal for a pool assigned by the Parent Pool based on network activity and algorithmic metrics.
+
+**activeLiquidity** — working capital of a pool: `balance - rebalancingFees`; used to classify Surplus/Balanced/Deficit.
+
+**Liquidity Utilisation Ratio (LUR)** — (Inflow + Outflow) / `targetBalance`; activity metric.
+
+**Net Drain Rate (NDR)** — (Outflow − Inflow) / `targetBalance`; liquidity stress metric.
+
+**Liquidity Health Score (LHS)** — aggregate health metric combining LUR and NDR (0.7/0.3 weighting in the initial iteration).
+
+**Progressive Reward Model** — sub-linear, time-sensitive bounty curve for Rebalancers, DAO-configurable and designed for sustainable incentives during extended deficits.
+
+
+## Interface
+
+### bridge
+
+```solidity
+function bridge(
+			address tokenReceiver,
+			uint256 tokenAmount,
+			uint24 dstChainSelector,
+			uint256 dstGasLimit,
+			bytes calldata dstCallData
+) external returns (bytes32 messageId)
+```
+
+Performs a cross-chain transfer of your liquidity ERC-20 token via Concero, optionally invoking a receiver hook on the destination chain.
+`_lancaReceive` is not invoked when `dstGasLimit == 0` and `dstCallData == 0x`. In that case, the contract simply transfers the tokens to `tokenReceiver` without calling `lancaReceive`.
+
+| Parameter          | Type (EVM) | Description                                                                             |
+| ------------------ | ---------- | --------------------------------------------------------------------------------------- |
+| `tokenReceiver`    | `address`  | Address on the destination chain to receive tokens (and, if present, execute the hook). |
+| `tokenAmount`      | `uint256`  | Amount of the liquidity token to bridge.                                                |
+| `dstChainSelector` | `uint24`   | Concero chain selector for the destination chain.                                       |
+| `dstGasLimit`      | `uint256`  | Gas limit for your hook on the destination chain.                                       |
+| `dstCallData`      | `bytes`    | ABI-encoded arguments for your hook.                                                    |
+
+:::warning
+msg.value must equal the native fee returned by getBridgeNativeFee(dstChainSelector, dstGasLimit).
+:::
+
+### \_lancaReceive
+
+```solidity
+function _lancaReceive(
+	bytes32 id,
+	uint24 srcChainSelector,
+	address sender,
+	uint256 amount,
+	bytes memory data
+) external;
+```
+
+| Parameter             | Type (EVM) | Description                                                                                         |
+| --------------------- | ---------- | --------------------------------------------------------------------------------------------------- |
+| `messageId`           | `bytes32`  | Unique identifier of the bridge message; use it for tracking and idempotency on the destination.    |
+| `sourceChainSelector` | `uint24`   | Concero selector of the **source** chain the transfer originated from.                              |
+| `tokenSender`         | `address`  | Sender address on the source chain that initiated the bridge.                                       |
+| `tokenAmount`         | `uint256`  | Amount of the liquidity token delivered **after fees** on the destination chain (token decimals).   |
+| `dstCallData`         | `bytes`    | ABI-encoded payload passed through from the sender; parse/validate according to your hook’s schema. |
+
+To handle bridged tokens with a hook, your destination contract must implement ILancaClient and support ERC-165 for type(ILancaClient).interfaceId.
+
+When the message arrives:
+
+* The bridge transfers tokens to tokenReceiver.
+* If a hook is configured, it then calls `ILancaClient(tokenReceiver).lancaReceive{gas: dstGasLimit}`
+
+If lancaReceive reverts or runs out of gas, the entire delivery reverts atomically (no tokens are transferred).
+
+:::warning
+inside lancaReceive, verify sender is your trusted destination pool/bridge on that chain.
+:::
+
+### getBridgeNativeFee
+
+```solidity
+function getBridgeNativeFee(
+	uint24 dstChainSelector,
+	uint256 dstGasLimit
+) external view returns (uint256)
+```
+
+Returns the native currency fee you must pass in msg.value when calling `bridge`.
+
+| Name             | Type    | Description                                    |
+| ---------------- | ------- | ---------------------------------------------- |
+| dstChainSelector | uint24  | Selector of the destination chain.             |
+| dstGasLimit      | uint256 | Gas limit for the destination hook (0 if none) |
+
+
+## Lanca Bridging Framework (LBF)
+
+**Lanca Bridging Framework (LBF)** is a fully decentralized cross-chain framework that enables seamless value transfer across blockchain networks by combining a *Parent-Child Pool* model, a dynamic IOU system, and hybrid liquidity management. The goal: eliminate liquidity fragmentation, improve capital efficiency, and scale interchain operations without compromising on security or decentralization.
+
+LBF relies on **Concero V2 Messaging** as the secure transport for interchain messages/instructions and uses automated operators (**LancaKeeper**), independent participants (**Rebalancers**), and a price oracle (**ConceroPriceFeed**) to maintain correct and efficient pool states across networks.
+
+### Key Advantages
+
+* Unified liquidity layer: LPs deposit once (into the *Parent Pool*) and get fee exposure across all supported chains.
+* Dynamically allocated liquidity via per-chain `targetBalance` values that adapt to network demand.
+* IOU mechanism incentivizes fast Rebalancer response to liquidity deficits without over-parking capital.
+* Flexible, configurable reward system for underserved chains (Progressive Reward Model).
+* Multi-layer security model (cryptographic, economic, operational monitoring).
+
+***
+
+
+## Lanca Bridge Architecture
+
+The architecture of Lanca Bridge is divided into two main components:
+
+1. **Execution Layer**
+2. **Settlement Layer**
+
+### Execution Layer
+
+The primary execution layer is built on **Concero Messaging**. This layer handles cross-chain communication by sending messages between Lanca Bridge contracts deployed on different chains. Upon receiving a message on the target chain, the Lanca Bridge contract triggers the associated integrator contract, which then provides liquidity from its pool to fulfill the requested operation.
+
+### Settlement Layer
+
+The settlement layer utilizes **Chainlink CCIP** (Cross-Chain Interoperability Protocol). Over time, Lanca Bridge accumulates liquidity on the source chain. Once a certain threshold is reached, the protocol sends this liquidity to the destination chain to replenish the amounts that were allocated during the Execution Layer phase.
+
+In cases where an issue occurs during the Execution Layer, the client will still receive their funds once the Settlement Layer is triggered and completes its process on the destination chain. This design ensures that even if cross-chain message execution encounters problems, the protocol’s settlement mechanism will ultimately restore and deliver the correct liquidity on the destination chain. Leveraging Chainlink CCIP for settlement adds a reliable and secure mechanism for transferring liquidity between chains
+
+
+## Contract Deployments
+
+### Lanca bridge contracts
+
+* Arbitrum: [0x4459d95b396c418B2144943910E2e68548fFE589](https://arbiscan.io/address/0x4459d95b396c418B2144943910E2e68548fFE589)
+* Avalanche: [0x3016e8e2DE83cb1AD385b97c6F28c8A6bC8Cf125](https://snowtrace.io/address/0x3016e8e2DE83cb1AD385b97c6F28c8A6bC8Cf125)
+* Base: [0xF44729175474a16A5886dfe42d154da21d7c362F](https://basescan.org/address/0xF44729175474a16A5886dfe42d154da21d7c362F)
+* Optimism: [0x084e84446FE08B27d1b7106ef4d29f813708d729](https://optimistic.etherscan.io/address/0x084e84446FE08B27d1b7106ef4d29f813708d729)
+* Polygon: [0x0EF5038Ef129401a5Ff963A55BF37A6CF2f29C91](https://polygonscan.com/address/0x0EF5038Ef129401a5Ff963A55BF37A6CF2f29C91)
+
+### Lanca pool contracts
+
+* Arbitrum: [0x164c20A4E11cBE0d8B5e23F5EE35675890BE280d](https://arbiscan.io/address/0x164c20A4E11cBE0d8B5e23F5EE35675890BE280d)
+* Avalanche: [0x164c20A4E11cBE0d8B5e23F5EE35675890BE280d](https://snowtrace.io/address/0x164c20A4E11cBE0d8B5e23F5EE35675890BE280d)
+* Base: [0x0AE1B2730066AD46481ab0a5fd2B5893f8aBa323](https://basescan.org/address/0x0AE1B2730066AD46481ab0a5fd2B5893f8aBa323)
+* Optimism: [0x8698c6DF1E354Ce3ED0dE508EF7AF4baB85D2F2D](https://optimistic.etherscan.io/address/0x8698c6DF1E354Ce3ED0dE508EF7AF4baB85D2F2D)
+* Polygon: [0x164c20A4E11cBE0d8B5e23F5EE35675890BE280d](https://polygonscan.com/address/0x164c20A4E11cBE0d8B5e23F5EE35675890BE280d)
+
+
+## Interface
+
+### bridge
+
+```solidity
+function bridge(BridgeReq calldata bridgeReq) external returns (bytes32)
+```
+
+Performs a cross-chain transfer of tokens from the source chain to the destination chain.
+
+##### Parameters
+
+##### struct BridgeReq
+
+| Name             | Type    | Description                                                                                                                                                                |
+| ---------------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| amount           | uint256 | amount of tokens to transfer                                                                                                                                               |
+| token            | address | address of the token to transfer                                                                                                                                           |
+| feeToken         | address | address of the token to pay the fee                                                                                                                                        |
+| receiver         | address | address of the receiver on the destination chain                                                                                                                           |
+| fallbackReceiver | address | address of the fallback receiver on the dst chain in case of failure execution layer. A bridge token will simply be sent to this address, no function will be called on it |
+| dstChainSelector | uint64  | selector of the destination chain                                                                                                                                          |
+| dstChainGasLimit | uint32  | gas limit for the destination chain                                                                                                                                        |
+| message          | bytes   | message to send to the destination chain                                                                                                                                   |
+
+### \_lancaBridgeReceive
+
+```solidity
+function _lancaBridgeReceive(LancaBridgeMessage calldata message) internal
+```
+
+To receive messages on the destination chain, your contract must inherit from the [LancaBridgeClient](https://github.com/lanca-io/bridge-contracts/blob/release/contracts/LancaBridgeClient/LancaBridgeClient.sol) contract. Within this client contract, the lancaBridgeReceive function is invoked, which enforces that \_lancaBridgeReceive can only be called by the LancaBridge contract, ensuring secure and authorized processing.
+
+:::warning
+⚠️ Warning
+
+Integrators must implement this function on their destination chain contract to properly handle the bridge message. Without a correct implementation, the token transfer will not complete. If the execution of lancaBridgeReceive fails, the token will be automatically transferred to the fallbackReceiver address specified in the BridgeReq structure after several hours, without invoking any function on that address.
+:::
+
+##### Parameters
+
+##### struct LancaBridgeMessage
+
+| Name             | Type    | Description                                                                                                                                                   |
+| ---------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| id               | bytes32 | a unique identifier for the bridge message, used for tracking and preventing replay attacks by ensuring that the same message is not processed multiple times |
+| sender           | address | the address of the sender on the source chain who initiated the cross-chain transfer                                                                          |
+| token            | address | the address of the token being transferred across chains                                                                                                      |
+| amount           | uint256 | the amount of tokens involved in the transfer                                                                                                                 |
+| srcChainSelector | uint64  | the identifier of the source chain from which the message originates                                                                                          |
+| data             | bytes   | additional data that may include instructions or parameters required for further processing of the transfer on the destination chain                          |
+
+### getFee
+
+```solidity
+function getFee(uint64 dstChainSelector, uint256 amount, address feeToken, uint32 dstChainGasLimit) public view returns (uint256)
+```
+
+##### Parameters
+
+| Name             | Type    | Description                         |
+| ---------------- | ------- | ----------------------------------- |
+| dstChainSelector | uint64  | selector of the destination chain   |
+| amount           | uint256 | amount of tokens to transfer        |
+| feeToken         | address | address of the token to pay the fee |
+| dstChainGasLimit | uint32  | gas limit for the destination chain |
+
+### getBridgeFeeBreakdown
+
+```solidity
+function getBridgeFeeBreakdown(uint64 dstChainSelector, uint256 amount, address feeToken, uint32 dstChainGasLimit) public view returns (uint256, uint256, uint256)
+```
+
+##### Parameters
+
+| Name             | Type    | Description                         |
+| ---------------- | ------- | ----------------------------------- |
+| dstChainSelector | uint64  | selector of the destination chain   |
+| amount           | uint256 | amount of tokens to transfer        |
+| feeToken         | address | address of the token to pay the fee |
+| dstChainGasLimit | uint32  | gas limit for the destination chain |
+
+### Types
+
+#### BridgeReq
+
+```solidity
+    struct BridgeReq {
+        uint256 amount;
+        address token;
+        address feeToken;
+        address receiver;
+        address fallbackReceiver;
+        uint64 dstChainSelector;
+        uint32 dstChainGasLimit;
+        bytes message;
+    }
+```
+
+#### LancaBridgeMessage
+
+```solidity
+    struct LancaBridgeMessage {
+        bytes32 id;
+        address sender;
+        address token;
+        uint256 amount;
+        uint64 srcChainSelector;
+        bytes data;
+    }
+```
+
+
+## Overview
+
+Lanca Bridge is a cross-chain infrastructure that enables the transfer of value from one chain to another. Under the hood, it uses Concero Messaging as the execution layer and CCIP as the settlement layer.
+
+### Supported networks
+
+Lanca Cross-Chain infrastructure v1 supports the following networks:
+
+* Base
+* Polygon
+* Arbitrum
+* Avalanche
+* Optimism
+
+
+## LancaSDK
+
+The `LancaClient` class provides a set of methods for interacting with the Lanca API.
+
+### Methods
+
+#### `getRoute`
+
+##### Description
+
+Retrieves a route for a given set of parameters. The route is an object that contains the necessary information for executing a swap.
+
+##### Parameters
+
+* `fromChainId` : `string`. The ID of the source chain from which the tokens will be swapped. This identifies the blockchain network where the tokens currently reside.
+* `toChainId` : `string`. The ID of the destination chain to which the tokens will be swapped. This indicates the blockchain network where the tokens will be sent after the swap.
+* `fromToken` : `Address`. The address of the token that the user wishes to swap from. This should be the contract address of the token being exchanged.
+* `toToken` :`Address`. The address of the token that the user wishes to swap to. This should be the contract address of the token that the user wants to receive in exchange.
+* `amount` : `string`. The amount of tokens to be swapped. This value should represent the quantity of the `fromToken` that the user intends to exchange.
+* `fromAddress`: `Address`. The address of the user from whom the tokens will be taken. This is the wallet address that holds the `fromToken` and will initiate the swap.
+* `toAddress`: `Address`. The address where the swapped tokens will be sent. This is the wallet address that will receive the `toToken` after the swap is completed.
+* `slippageTolerance` : `string` . The maximum allowed slippage during the swap transaction, expressed as a percentage. This parameter is optional, with a default value of '0.5'. Slippage refers to the difference between the expected price of a trade and the actual price at which the trade is executed. Setting a slippage tolerance helps to ensure that the transaction will go through even if the market conditions change slightly during the swap process.
+
+##### Return Type
+
+* `Promise<IRouteType | undefined>`
+
+##### Error Types
+
+* `UnsupportedTokenError` - thrown when the specified token(s) is(are) not supported for swapping.
+* `UnsupportedChainError` - thrown when the specified chain(s) is(are) not supported for swapping.
+* `WrongAmountError` - thrown when the amount specified for the swap is incorrect.
+* `TokensAreTheSameError` - thrown when the `fromToken` and `toToken` are the same.
+* `NoRouteError` - thrown when no valid route is found for the swap.
+* `TooHighAmountError` - thrown when the specified amount exceeds the allowed limit.
+* `TooLowAmountError` - thrown when the specified amount is below the minimum required for the swap.
+* `AmountBelowFeeError` - thrown when the amount is less than the transaction fee.
+* `WrongSlippageError` - thrown when the specified slippage tolerance is invalid.
+* `MissingParamsError` - thrown when required parameters are missing.
+* `HTTPError` - thrown when there is an issue with the HTTP request during the swap process.
+* `UserRejectedError` - thrown when the user rejected to sing the transaction
+
+##### Example
+
+```ts
+// [!include ~/snippets/code/methods/getRoute.ts]
+```
+
+***
+
+#### `getSupportedTokens`
+
+##### Description
+
+Retrieves a list of supported tokens for a given chain ID, name, symbol, and limit.
+
+##### Parameters
+
+* `chainId` : `string`. The ID of the chain to retrieve tokens for
+* `name?` : `string`. The name of the token to retrieve
+* `symbol?` : `string`. The symbol of the token to retrieve
+* `limit` :`string`. The maximum number of tokens to retrieve (optional, default: '10000000')
+
+##### Return Type
+
+* `Promise<ILancaToken[] | undefined>`
+
+##### Example
+
+```ts
+// [!include ~/snippets/code/methods/getSupportedTokens.ts]
+```
+
+***
+
+#### `getSupportedChains`
+
+##### Description
+
+Retrieves a list of supported chains.
+
+##### Parameters
+
+* None
+
+##### Return Type
+
+* `Promise<ILancaChain[] | undefined>`
+
+##### Example
+
+```ts
+// [!include ~/snippets/code/methods/getSupportedChains.ts]
+```
+
+***
+
+#### `getRouteStatus`
+
+##### Description
+
+Retrieves the status of a route for a given transaction hash.
+
+##### Parameters
+
+* `txHash` : `string`. The transaction hash of the route
+
+##### Return Type
+
+* `Promise<ITxStep[] | undefined>`
+
+##### Example
+
+```ts
+// [!include ~/snippets/code/methods/getRouteStatus.ts]
+```
+
+***
+
+#### `executeRoute`
+
+##### Description
+
+Executes a previously retrieved route using the provided execution configurations.
+
+##### Parameters
+
+* `route` : `IRouteType`. The route object retrieved from `getRoute`
+* `executionConfigs` : `ExecutionConfigs`. The execution configurations for the swap
+  * `switchChainHook?`: `SwitchChainHook`. The hook to switch chain
+  * `updateRouteStatusHook?` : `UpdateRouteHook`. The hook to update route status
+  * `txLink?` : `string`. The transaction hash link
+
+##### Return Type
+
+* `Promise<IRouteType | undefined>`
+
+##### Example
+
+```ts
+// [!include ~/snippets/code/methods/executeRoute.ts]
+```
+
+
+## Data Types
+
+### Types
+
+#### `RpcConfig`
+
+A type representing a configuration for RPC.
+
+Type
+
+* `Record<string, IChainWithProvider>`- an object with chain IDs as keys and either arrays of RPC URLs or fallback transport configurations (from viem) as values. This structure allows for flexible and efficient management of RPC connections across multiple blockchain networks.
+
+***
+
+#### `SwitchChainHook`
+
+A type representing a hook function that switches the blockchain chain.
+
+Type
+
+* `(chainId: number) => Promise<WalletClient | undefined | void>`- a function that takes a chain ID as an argument and returns a promise that resolves to a `WalletClient` object, `undefined`, or `void`.
+
+This hook is used to switch the blockchain chain and retrieve a `WalletClient` object for the new chain. The hook function should handle the chain switching logic and return a promise that resolves to the `WalletClient` object,`undefined` or `void` if the chain switching fails.
+
+***
+
+#### `UpdateRouteHook`
+
+A type representing a hook function that updates the route execution state.
+
+Type
+
+* `(executionState: IRouteType) => void`- a function that takes the current execution state of the route as an argument and updates the route execution state accordingly.
+
+This hook is used to update the route execution state in real-time, allowing for dynamic changes to the route execution process. The hook function should handle the logic for updating the route execution state based on the provided execution state.
+
+### Interfaces
+
+#### `IChainWithProvider`
+
+An interface representing the object with chain and provider.
+
+Properties
+
+* `chain`: `Chain` - an object representing the chain.
+* `provider?`: `Transport` - a transport configuration for the RPC connection.
+
+***
+
+#### `IExecutionConfig`
+
+An interface representing the configuration for the execution of a route.
+
+Properties
+
+* `switchChainHook?`: `SwitchChainHook` - a hook function that switches the blockchain chain.
+* `updateRouteStatusHook?`: `UpdateRouteHook` - a hook function that updates the route execution state.
+* `txLink?`: `string` - a link to the transaction.
+
+This configuration object is used to customize the execution of a route. The `switchChainHook` property allows for custom chain switching logic, while the `updateRouteStatusHook` property enables real-time updates to the route execution state. The `txLink` property provides a link to the transaction for easy access.
+
+***
+
+#### `ILancaClientConfig`
+
+An interface representing a configuration for LancaClient.
+
+Properties
+
+* `integratorAddress?`: `Address` - integrator address.
+* `feeBps?`: `number` - fee tier.
+* `chains?`: `RpcConfig` - configuration for the supported blockchain networks. This property is optional and allows users to specify the RPC (Remote Procedure Call) settings for different chains that the client will interact with. Proper configuration of this property ensures that the client can communicate effectively with the desired blockchain networks.
+
+***
+
+#### `ILancaToken`
+
+An interface representing a token in a blockchain.
+
+Properties
+
+* `address`: `Address` - the unique address of the token on the blockchain. This is the contract address that identifies the token and is used for transactions and interactions.
+* `chainId`: `string` - the identifier for the blockchain network on which the token resides. This helps in distinguishing tokens that may have the same name or symbol but exist on different chains.
+* `decimals`: `number` - the number of decimal places that the token supports. This value indicates the smallest unit of the token and is crucial for accurate calculations and transactions involving fractional amounts.
+* `logoURL`: `string` - the URL pointing to the token's logo image. This is used for visual representation in user interfaces, helping users easily identify the token.
+* `name`: `string` - the full name of the token. This is a human-readable representation of the token, providing clarity about its purpose or function.
+* `symbol`: `string` - the abbreviated symbol of the token, typically consisting of a few letters. This is used for quick identification and trading of the token on exchanges.
+* `priceUsd`: `number` - the current price of the token expressed in USD. This value provides users with an understanding of the token's market value and is essential for trading and investment decisions.
+
+***
+
+#### `ILancaChain`
+
+An interface representing a blockchain chain.
+
+Properties
+
+* `id`: `string` - the unique identifier for the blockchain chain. This ID is used to reference the chain in various operations and configurations.
+* `explorerURL`: `string` - the URL of the blockchain explorer for the chain. This link allows users to view transactions, blocks, and other on-chain data, providing transparency and insight into the blockchain's activity.
+* `logoURL`: `string` - the URL pointing to the logo image of the blockchain chain. This is used for branding and visual representation in applications, helping users recognize the chain easily.
+* `name`: `string` - The full name of the blockchain chain. This human-readable name provides context about the chain's purpose, features, or community, making it easier for users to understand its significance.
+
+***
+
+#### `ITxStep`
+
+An interface representing a transaction step.
+
+Properties
+
+* `type?`: `StepType` - transaction step type
+* `status`: `Status` - transaction step status
+* `txHash?`: `Hash` - the unique hash of the transaction associated with this step. This property is optional and can be included to provide a reference for users to look up the transaction on a blockchain explorer or to verify its status.
+* `error?`: `string` - a message describing any error that occurred during this transaction step. This property is optional and is particularly useful for debugging and informing users about issues that may have prevented the step from completing successfully.
+
+***
+
+#### `IFee`
+
+An interface representing a transaction fee.
+
+Properties
+
+* `type`: `string` - transaction fee type
+* `amount`: `string` - transaction fee amount
+* `token`: `ILancaToken` - fee token
+
+***
+
+#### `IRouteTool`
+
+An interface representing a routing tool used for facilitating token swaps or transactions across different decentralized exchanges (DEXs). This interface provides essential information about the tool, enabling users and applications to utilize it effectively for routing transactions.
+
+Properties
+
+* `name`: `string` - the name of the routing tool. This property provides a human-readable identifier for the tool, helping users understand which routing mechanism or service is being utilized.
+* `amountOutMin?`: `string` - the minimum output amount expected from the transaction. This property is optional and allows users to set a threshold for the minimum amount of tokens they wish to receive from the swap. Setting this value helps protect users from unfavorable market conditions and slippage.
+* `logoURL`: `string` - the URL pointing to the logo image of the routing tool. This property is used for visual representation in user interfaces, allowing users to easily identify the tool being used for the transaction.
+* `data?`: `object` - an object containing additional parameters specific to the routing tool. This property is optional and can include various parameters that are necessary for the tool's operation:
+  * `dexRouter`: `Address` - the address of the DEX router that will facilitate the token swap. This address is crucial for directing the transaction to the correct smart contract on the blockchain.
+  * `dexCallData`: `Hex` - the calldata to be sent to the DexSwap contract. This hexadecimal string contains the encoded function call and parameters required for executing the swap on the DEX, ensuring that the transaction is processed correctly.
+
+***
+
+#### `ISwapDirectionData`
+
+An interface representing the direction for a token swap. This interface encapsulates the details of the source token and its associated blockchain chain, providing essential information for executing a swap.
+
+Properties
+
+* `token`: `ILancaToken` - the source token involved in the swap. This property provides details about the token being exchanged, including its address, symbol, and other relevant attributes.
+* `chain`: `ILancaChain` - the blockchain chain on which the source token resides. This property identifies the network where the token is located, ensuring that the swap is executed on the correct chain.
+* `amount`: `string` - the amount of the source token to be swapped. This value represents the quantity of tokens that the user intends to exchange, which is crucial for calculating the swap's output.
+
+***
+
+#### `IRouteInternalStep`
+
+An interface representing an internal routing step within a transaction process. This interface provides information about the source and destination tokens and chains involved in the routing.
+
+Properties
+
+* `from`: `ISwapDirectionData` - information about the source token and chain. This property contains details about the token being swapped and the chain it originates from.
+* `to`: `ISwapDirectionData` - information about the destination token and chain. This property provides details about the token that will be received after the swap and the chain it will be sent to.
+* `tool`: `IRouteTool` - the routing tool used for this internal step. This property specifies the mechanism or service that facilitates the swap, including any relevant parameters.
+
+***
+
+#### `IRouteBaseStep`
+
+An interface representing a basic routing step in the transaction process. This interface serves as a foundation for more complex routing steps.
+
+Properties
+
+* `type`: `StepType` - the type of the routing step. This property categorizes the step within the routing process, providing context about its function.
+* `execution?`: `ITxStep` - the current state of execution for this step. This property is optional and can be used to track the progress and status of the step, including any errors that may have occurred.
+
+***
+
+#### `IRouteStep`
+
+An interface representing a routing step that extends `IRouteBaseStep`. This interface provides detailed information about the routing process, including the source and destination tokens and any internal steps involved.
+
+Properties
+
+* `from`: `ISwapDirectionData` - information about the source token and chain. This property contains details about the token being swapped and the chain it originates from.
+* `to`: `ISwapDirectionData` - information about the destination token and chain. This property provides details about the token that will be received after the swap and the chain it will be sent to.
+* `internalSteps`: `IRouteInternalStep[]` - an array of internal routing steps. This property contains the sequence of internal steps that will be executed as part of the routing process, detailing how the swap will be carried out.
+* `fees?`: `IFee[]` - an array of fee objects associated with this routing step. This property is optional and provides information about the transaction fees that will be incurred during the swap.
+
+***
+
+#### `IRouteType`
+
+An interface representing a routing type. This interface encapsulates the overall routing process, including the source and destination tokens and the steps involved in the routing.
+
+Properties
+
+* `from`: `ISwapDirectionData` - information about the source token and chain. This property contains details about the token being swapped and the chain it originates from.
+* `to`: `ISwapDirectionData` - information about the destination token and chain. This property provides details about the token that will be received after the swap and the chain it will be sent to.
+* `steps`: `Array<IRouteStep | IRouteBaseStep>` - an array of routing steps. This property contains the sequence of steps that will be executed during the routing process, detailing how the swap will be carried out.
+
+### Enums
+
+#### `Status`
+
+An enumeration representing the status of a transaction. This enumeration provides a set of predefined values to indicate the current state of a transaction.
+
+Values
+
+* `SUCCESS` - indicates that the transaction was successful and completed without issues.
+* `FAILED` - indicates that the transaction has failed, typically due to an error or issue during execution.
+* `PENDING` - indicates that the transaction is currently pending and has not yet been completed.
+* `NOT_STARTED` - indicates that the transaction has not yet been initiated.
+
+***
+
+#### `StepType`
+
+An enumeration representing the type of a routing step. This enumeration provides predefined values to categorize the various steps involved in the routing process.
+
+Values
+
+* `SRC_SWAP` - represents a step for swapping tokens on the source chain. This step involves exchanging the source token for another token within the same blockchain network.
+* `BRIDGE` - represents a step for transitioning between chains. This step facilitates the movement of tokens from one blockchain network to another, often involving a bridging mechanism.
+* `DST_SWAP` - represents a step for swapping tokens on the destination chain. This step occurs after the tokens have been bridged and involves exchanging the tokens for the desired token on the target blockchain network.
+* `ALLOWANCE` - represents a step for setting the allowance for token transfers. This step is necessary when a user needs to grant permission for a smart contract to spend a specified amount of their tokens on their behalf.
+* `SWITCH_CHAIN` - represents a step for switching chains. This step indicates that the transaction process involves changing the active blockchain network, which may be necessary for executing certain operations or swaps.
+
