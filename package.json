@@ -9,9 +9,11 @@
 		"format:fix": "prettier --write ."
 	},
 	"dependencies": {
+		"@types/katex": "^0.16.7",
+		"katex": "^0.16.22",
 		"react": "latest",
 		"react-dom": "latest",
-		"react-latex-next": "3.0.0",
+		"react-latex-next": "^3.0.0",
 		"vocs": "1.0.13"
 	},
 	"devDependencies": {

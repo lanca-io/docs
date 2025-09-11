@@ -17,6 +17,24 @@ export default defineConfig({
 	iconUrl: '/logo/lanca/favicon.ico',
 	sidebar: [
 		{
+			text: 'Introduction to Lanca Bridging Framework (LBF)',
+			collapsed: true,
+			items: [
+				{
+					text: 'What is LBF?',
+					link: '/introduction/what-is-lbf',
+				},
+				{
+					text: 'How LBF Works?',
+					link: '/introduction/how-lbf-works',
+				},
+				{
+					text: 'What Benefits Does LBF Bring?',
+					link: '/introduction/key-benefits',
+				}
+			],
+		},
+		{
 			text: 'V1',
 			collapsed: false,
 			items: [
@@ -66,10 +84,6 @@ export default defineConfig({
 			text: 'Lanca Bridging Framework',
 			collapsed: false,
 			items: [
-				{
-					text: 'Overview',
-					link: '/lbf/overview',
-				},
 				{
 					text: 'Architecture',
 					link: '/lbf/architecture',
