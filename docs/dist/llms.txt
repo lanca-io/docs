@@ -9,8 +9,7 @@
 - [Lanca Canonical Bridge](/lanca-canonical-bridge/overview): **Lanca Canonical Bridge** is a canonical cross-chain infrastructure that enables secure transfer of USDC between Ethereum and other blockchain networks. Built on top of **Concero Messaging V2**, it implements a Lock-Release mechanism on L1 (Ethereum) and Burn-Mint mechanism on destination chains to ensure 1:1 backing of bridged assets.
 - [LBF Architecture Overview](/lbf/architecture): Lanca Bridging Framework is a fully decentralised cross-chain bridging framework enabling seamless value transfer across different blockchain networks.
 - [Dynamic Liquidity Rebalancing Algorithm](/lbf/architecture): Triggers periodic Child pool liquidity snapshots;
-- [Router Deployments](/lbf/deployments): This page lists all CONCERO\_ROUTER\_PROXY addresses from our deployment configuration.
-Use the toggle switch to view addresses for testnet or mainnet environments.
+- [LBF Deployments](/lbf/deployments)
 - [Glossary](/lbf/glossary): **LBF (Lanca Bridging Framework)** — decentralized cross-chain liquidity framework enabling value movement between networks with high capital efficiency and security.
 - [Interface](/lbf/interface): Performs a cross-chain transfer of your liquidity ERC-20 token via Concero, optionally invoking a receiver hook on the destination chain.
 `_lancaReceive` is not invoked when `dstGasLimit == 0` and `dstCallData == 0x`. In that case, the contract simply transfers the tokens to `tokenReceiver` without calling `lancaReceive`.

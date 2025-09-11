@@ -411,22 +411,11 @@ Reliance on cross-chain communication (Concero V2 Messaging) means message integ
 The IOU burn/mint mechanism is vulnerable to replay attacks unless strict cross-chain message *nonce* handling is enforced; reprocessing a valid message could double-mint IOUs and enable economic exploitation.
 
 
-## Router Deployments
-
-This page lists all CONCERO\_ROUTER\_PROXY addresses from our deployment configuration.
-Use the toggle switch to view addresses for testnet or mainnet environments.
+## LBF Deployments
 
 import RouterDeploymentsWithSwitch from '../../components/RouterDeploymentsWithSwitch.tsx';
 
 <RouterDeploymentsWithSwitch />
-
-### Using Router Proxies
-
-To use these router proxies in your contracts, you'll need to:
-
-1. Import the required interfaces
-2. Initialize the router with the appropriate address for your network
-3. Call the router's messaging functions
 
 
 ## Glossary
