@@ -67,11 +67,19 @@ export default defineConfig({
 			collapsed: false,
 			items: [
 				{
-					text: 'Overview',
-					link: '/lbf/overview',
+					text: 'What is LBF?',
+					link: '/lbf/what-is-lbf',
 				},
 				{
-					text: 'Architecture',
+					text: 'Core Concepts',
+					link: '/lbf/core-concepts',
+				},
+				{
+					text: 'Key Benefits',
+					link: '/lbf/key-benefits',
+				},
+				{
+					text: 'Technical Architecture',
 					link: '/lbf/architecture',
 				},
 				{
@@ -93,7 +101,7 @@ export default defineConfig({
 					link: '/lanca-canonical-bridge/overview',
 				},
 				{
-					text: 'Architecture',
+					text: 'Technical Architecture',
 					link: '/lanca-canonical-bridge/architecture',
 				},
 			],
