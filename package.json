@@ -9,16 +9,14 @@
 		"format:fix": "prettier --write ."
 	},
 	"dependencies": {
-		"@types/katex": "0.16.7",
 		"katex": "^0.16.23",
-		"react": "19",
-		"react-dom": "19",
-		"react-latex-next": "3.0.0",
+		"react": "18",
+		"react-dom": "18",
+		"react-latex-next": "^3.0.0",
 		"vocs": "1.0.13"
 	},
 	"devDependencies": {
-		"@types/react": "19",
-		"@types/react-katex": "3.0.4",
+		"@types/react": "18",
 		"husky": "9.1.7",
 		"prettier": "3.4.2",
 		"typescript": "latest"
