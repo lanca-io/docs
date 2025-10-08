@@ -13,6 +13,13 @@ export const GITHUB_REPOSITORIES = {
 			MAINNET_DEPLOYMENTS: '/.env.deployments.mainnet',
 		},
 	},
+	USDCe_CONTRACTS: {
+		BASE_URL: 'https://raw.githubusercontent.com/lanca-io/lanca-canonical-bridge/master',
+		FILES: {
+			TESTNET_DEPLOYMENTS: '/.env.deployments.testnet',
+			MAINNET_DEPLOYMENTS: '/.env.deployments.mainnet',
+		},
+	},
 	RPCS: {
 		SUPPORTED_NETWORKS_URL:
 			'https://raw.githubusercontent.com/concero/rpcs/feature/refactor/output/supported-chains.json',
@@ -26,5 +33,11 @@ export const LBF_PROXY_CONFIG = {
 	VARIABLE_PREFIX: ['CHILD_POOL_PROXY', 'PARENT_POOL_PROXY'],
 	ADMIN_SUFFIX: '_ADMIN',
 }
+
+export const USDCe_PROXY_CONFIG = {
+	VARIABLE_PREFIX: ['USDC_PROXY'],
+	ADMIN_SUFFIX: '_ADMIN',
+}
+
 
 export type NetworkEnvironment = 'testnet' | 'mainnet'
